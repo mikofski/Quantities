@@ -39,104 +39,121 @@ classdef quantity < double
                  case '.'
                      F = F.(s_.subs);
                  case '()'
-                     F = quantity(subsref(F.average,s_), ...
+                     F = Quantities.quantity(subsref(F.average,s_), ...
                          subsref(F.variance,s_));
              end
          end
         end
         function F = subsasgn(x,idx,y)
-            F = quantity(subsasgn(x.average,idx,y.average), ...
+            F = Quantities.quantity(subsasgn(x.average,idx,y.average), ...
                 subsasgn(x.variance,idx,y.variance));
+        end
+        function F = horzcat(varargin)
+            avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
+            var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
+            F = Quantities.quantity([avg_{:}],[var_{:}]);
+        end
+        function F = vertcat(varargin)
+            avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
+            var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
+            F = Quantities.quantity(vertcat(avg_{:}),vertcat(var_{:}));
+        end
+        function F = cat(dim,varargin)
+            if dim==1
+                F = vertcat(varargin{:});
+            elseif dim==2
+                F = horzcat(varargin{:});
+            end
         end
         function F = plus(x,y)
             % F = x+y
             % dF^2 = dx.^2+dy.^2
             F = plus@double(x,y);
-            if isa(y,'quantity')
-                F = quantity(F,x.variance.^2+y.variance.^2);
+            if isa(y,'Quantities.quantity')
+                F = Quantities.quantity(F,x.variance.^2+y.variance.^2);
             else
-                F = quantity(F,x.variance);
+                F = Quantities.quantity(F,x.variance);
             end
         end
         function F = minus(x,y)
             % F = x-y
             % dF^2 = dx.^2-dy.^2
             F = minus@double(x,y);
-            if isa(y,'quantity')
-                F = quantity(F,x.variance.^2-y.variance.^2);
+            if isa(y,'Quantities.quantity')
+                F = Quantities.quantity(F,x.variance.^2-y.variance.^2);
             else
-                F = quantity(F,x.variance);
+                F = Quantities.quantity(F,x.variance);
             end
         end
         function F = times(x,y)
             % F = x.*y
             % dF^2 = y^2.*dx^2+x^2.*dy^2
             F = times@double(x,y);
-            if isa(y,'quantity')
-                F = quantity(F,y.average.^2.*x.variance.^2+ ...
+            if isa(y,'Quantities.quantity')
+                F = Quantities.quantity(F,y.average.^2.*x.variance.^2+ ...
                     x.average.^2.*y.variance.^2);
             else
-                F = quantity(F,x.variance);
+                F = Quantities.quantity(F,x.variance);
             end
         end
         function F = rdivide(x,y)
             % F = x./y
             % dF^2 = 1./y.^2.*dx.^2-x.^2./y.^4.*dy^2
             F = rdivide@double(x,y);
-            if isa(y,'quantity')
-                F = quantity(F,1./y.average.^2.*x.variance.^2- ...
+            if isa(y,'Quantities.quantity')
+                F = Quantities.quantity(F,1./y.average.^2.*x.variance.^2- ...
                     x.average.^2./y.average.^4.*y.variance.^2);
             else
-                F = quantity(F,x.variance);
+                F = Quantities.quantity(F,x.variance);
             end
         end
         function F = ldivide(x,y)
             % F = x.\y = y./x
             % dF^2 = 1./x.^2.*dy.^2-y.^2./x.^4.*dx^2
             F = ldivide@double(x,y);
-            if isa(y,'quantity')
-                F = quantity(F,1./x.average.^2.*(y.variance).^2- ...
+            if isa(y,'Quantities.quantity')
+                F = Quantities.quantity(F,1./x.average.^2.*(y.variance).^2- ...
                     y.average.^2./x.average.^4.*(x.variance).^2);
             else
-                F = quantity(F,x.variance);
+                F = Quantities.quantity(F,x.variance);
             end
         end
         function F = uplus(x)
             % F = +x
-            F = quantity(uplus@double(x),x.variance);
+            F = Quantities.quantity(uplus@double(x),x.variance);
         end
         function F = uminus(x)
             % F = -x
-            F = quantity(uminus@double(x),x.variance);
+            F = Quantities.quantity(uminus@double(x),x.variance);
         end
         function F = sin(x)
             % F = sin(x)
             % dF^2 = cos(x)^2*dx^2
-            F = quantity(sin@double(x), ...
+            F = Quantities.quantity(sin@double(x), ...
                 cos(x.average).^2.*x.variance.^2);
         end
         function F = cos(x)
             % F = cos(x)
             % dF^2 = -sin(x)^2*dx^2
-            F = quantity(cos@double(x), ...
+            F = Quantities.quantity(cos@double(x), ...
                 (-sin(x.average)).^2.*x.variance.^2);
         end
         function F = log(x)
             % F = log(x)
             % dF^2 = (1/x)^2*dx^2
-            F = quantity(log@double(x), ...
+            F = Quantities.quantity(log@double(x), ...
                 1./x.average.^2.*x.variance.^2);
         end
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2))^2*dx^2
-            F = quantity(log2@double(x), ...
+            F = Quantities.quantity(log2@double(x), ...
                 1./(log(2)*x.average).^2.*x.variance.^2);
         end
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10))^2*dx^2
-            F = quantity(log10@double(x), ...
+            F = Quantities.quantity(log10@double(x), ...
                 1./(log(10)*x.average).^2.*x.variance.^2);
         end
     end
