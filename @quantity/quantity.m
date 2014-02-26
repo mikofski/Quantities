@@ -69,53 +69,63 @@ classdef quantity < double
             % F = x+y
             % dF^2 = dx.^2+dy.^2
             F = plus@double(x,y);
-            if isa(y,'Quantities.quantity')
+            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance.^2+y.variance.^2);
-            else
+            elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
+            else
+                F = Quantities.quantity(F,y.variance);
             end
         end
         function F = minus(x,y)
             % F = x-y
             % dF^2 = dx.^2-dy.^2
             F = minus@double(x,y);
-            if isa(y,'Quantities.quantity')
+            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance.^2-y.variance.^2);
-            else
+            elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
+            else
+                F = Quantities.quantity(F,y.variance);
             end
         end
         function F = times(x,y)
             % F = x.*y
             % dF^2 = y^2.*dx^2+x^2.*dy^2
             F = times@double(x,y);
-            if isa(y,'Quantities.quantity')
+            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,y.average.^2.*x.variance.^2+ ...
                     x.average.^2.*y.variance.^2);
-            else
+            elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
+            else
+                F = Quantities.quantity(F,y.variance);
             end
         end
         function F = rdivide(x,y)
             % F = x./y
             % dF^2 = 1./y.^2.*dx.^2-x.^2./y.^4.*dy^2
             F = rdivide@double(x,y);
-            if isa(y,'Quantities.quantity')
+            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,1./y.average.^2.*x.variance.^2- ...
                     x.average.^2./y.average.^4.*y.variance.^2);
-            else
+            elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
+            else
+                F = Quantities.quantity(F,y.variance);
             end
         end
         function F = ldivide(x,y)
             % F = x.\y = y./x
             % dF^2 = 1./x.^2.*dy.^2-y.^2./x.^4.*dx^2
             F = ldivide@double(x,y);
-            if isa(y,'Quantities.quantity')
+            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,1./x.average.^2.*(y.variance).^2- ...
                     y.average.^2./x.average.^4.*(x.variance).^2);
-            else
+            elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
+            else
+                F = Quantities.quantity(F,y.variance);
             end
         end
         function F = uplus(x)
