@@ -32,6 +32,12 @@ classdef quantity < double
                 disp@double(x)
             end
         end
+        function F = transpose(x)
+            F = Quantities.quantity(transpose@double(x),transpose(x.variance));
+        end
+        function F = ctranspose(x)
+            F = Quantities.quantity(ctranspose@double(x),ctranspose(x.variance));
+        end
         function F = subsref(x,s)
          F = x;
          for s_ = s
@@ -65,68 +71,75 @@ classdef quantity < double
                 F = horzcat(varargin{:});
             end
         end
-        function F = plus(x,y)
-            % F = x+y
-            % dF^2 = dx.^2+dy.^2
-            F = plus@double(x,y);
+        function F = binop(x,y,F,Fvar)
+            % BINOP(X,Y,F,FVAR) Binary operation.
+            %
+            % Args
+            %     X (double): First argument.
+            %     Y (double): Second argument.
+            %     F (double): Return value.
+            %     FVAR (function handle): Calculates variance of F given X, Y,
+            %         DX and DY.
+            %
+            % Returns:
+            %     quantity: 
+            % 
             if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance.^2+y.variance.^2);
+                F = Quantities.quantity(F,...
+                    Fvar(x.average,y.average,x.variance,y.variance));
             elseif isa(x,'Quantities.quantity')
                 F = Quantities.quantity(F,x.variance);
             else
                 F = Quantities.quantity(F,y.variance);
             end
+        end
+        function F = plus(x,y)
+            % F = x+y
+            % dF^2 = dx.^2+dy.^2
+            F = binop(x,y,plus@double(x,y),@(x,y,dx,dy)dx.^2+dy.^2);
         end
         function F = minus(x,y)
             % F = x-y
             % dF^2 = dx.^2-dy.^2
-            F = minus@double(x,y);
-            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance.^2-y.variance.^2);
-            elseif isa(x,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance);
-            else
-                F = Quantities.quantity(F,y.variance);
-            end
+            F = binop(x,y,minus@double(x,y),@(x,y,dx,dy)dx.^2-dy.^2);
         end
         function F = times(x,y)
             % F = x.*y
-            % dF^2 = y^2.*dx^2+x^2.*dy^2
-            F = times@double(x,y);
-            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,y.average.^2.*x.variance.^2+ ...
-                    x.average.^2.*y.variance.^2);
-            elseif isa(x,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance);
-            else
-                F = Quantities.quantity(F,y.variance);
+            % dF^2 = y.^2.*dx.^2+x.^2.*dy.^2
+            F = binop(x,y,times@double(x,y),...
+                @(x,y,dx,dy)y.^2.*dx.^2+x.^2.*dy.^2);
+        end
+        function F = mtimes(x,y)
+            % F_ik = x_ij*y_jk = x_i1*y_1k + x_i2*y_2k + x_i3*y_3k
+            % dF_ik^2 = dx_ij.^2*y_jk.^2+x_ij.^2*dy_jk.^2
+            function dF = Fvar(x,y,dx,dy)
+                dF = zeros(size(x,1),size(y,2));
+                for idx = 1:size(x,1)
+                    for kdx = 1:size(y,2)
+                        dF(idx,kdx) = dx(idx,:).^2*y(:,kdx).^2+...
+                            x(idx,:).^2*dy(:,kdx).^2;
+                    end
+                end
             end
+            F = binop(x,y,mtimes@double(x,y),@Fvar);
+        end
+        function F = power(x,y)
+            % F = x.^y
+            % dF^2 = y.^2.*dx.^2+x.^2.*dy.^2
+            F = binop(x,y,power@double(x,y),...
+                @(x,y,dx,dy)(y.*x.^(y-1)).^2.*dx.^2+(log(x).*x.^y).^2.*dy.^2);
         end
         function F = rdivide(x,y)
             % F = x./y
-            % dF^2 = 1./y.^2.*dx.^2-x.^2./y.^4.*dy^2
-            F = rdivide@double(x,y);
-            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,1./y.average.^2.*x.variance.^2- ...
-                    x.average.^2./y.average.^4.*y.variance.^2);
-            elseif isa(x,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance);
-            else
-                F = Quantities.quantity(F,y.variance);
-            end
+            % dF^2 = 1./y.^2.*dx.^2-x.^2./y.^4.*dy.^2
+            F = binop(x,y,rdivide@double(x,y),...
+                @(x,y,dx,dy)1./y.^2.*dx.^2-x.^2./y.^4.*dy.^2);
         end
         function F = ldivide(x,y)
             % F = x.\y = y./x
-            % dF^2 = 1./x.^2.*dy.^2-y.^2./x.^4.*dx^2
-            F = ldivide@double(x,y);
-            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,1./x.average.^2.*(y.variance).^2- ...
-                    y.average.^2./x.average.^4.*(x.variance).^2);
-            elseif isa(x,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance);
-            else
-                F = Quantities.quantity(F,y.variance);
-            end
+            % dF^2 = 1./x.^2.*dy.^2-y.^2./x.^4.*dx.^2
+            F = binop(x,y,ldivide@double(x,y),...
+                @(x,y,dx,dy)1./x.^2.*dy.^2-y.^2./x.^4.*dx.^2);
         end
         function F = uplus(x)
             % F = +x
