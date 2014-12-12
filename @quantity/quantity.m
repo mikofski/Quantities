@@ -4,14 +4,27 @@ classdef quantity < double
         variance % second moment = trap(x,y^2 - average^2)/trap(x)
         stdev % standard deviation = sqrt(variance)
         relative % relative standard deviation = standard deviation / average
+        units
     end
     methods
-        function x = quantity(average,variance)
-            x = x@double(average);
+        function x = quantity(average,varargin)
+            p = inputParser;
+            p.addRequired('average');
+            p.addOptional('variance',0,...
+                @(arg)validateattributes(arg,{'numeric'},...
+                {'real','finite','size',size(average),'nonnegative'},...
+                'quantity','variance'))
+            p.addOptional('units','dimensionless',...
+                @(arg)validateattributes(arg,{'char'},{'row'},...
+                'quantity','units'))
+            p.parse(average,varargin{:});
+            args = p.Results;
+            x = x@double(args.average);
             x.average = double(x);
-            x.variance = abs(variance);
+            x.variance = abs(args.variance);
             x.stdev = sqrt(x.variance);
             x.relative = x.stdev./x.average;
+            x.units = args.units;
         end
         function disp(x)
             if isscalar(x)

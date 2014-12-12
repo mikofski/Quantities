@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE doc [
+<!ENTITY constants SYSTEM "constants_en.xml">
+]>
+
+<ureg>
+
+  <!-- constants -->
+  &constants;
+
+  <!-- reference -->
+  <unit name="meter" type="length">
+    <alias>m</alias>
+    <alias>metre</alias>
+  </unit>
+  <unit name="second" type="time">
+    <alias>s</alias>
+    <alias>sec</alias>
+  </unit>
+  <unit name="ampere" type="current">
+    <alias>A</alias>
+    <alias>amp</alias>
+  </unit>
+  <unit name="candela" type="luminosity">
+    <alias>cd</alias>
+    <alias>candle</alias>
+  </unit>
+  <unit name="gram" type="mass">
+    <alias>g</alias>
+  </unit>
+  <unit name="mole" type="substance">
+    <alias>mol</alias>
+  </unit>
+  <unit name="kelvin" type="temperature">
+    <alias>K</alias>
+    <alias>degK</alias>
+  </unit>
+  <unit name="radian">
+    <alias>rad</alias>
+  </unit>
+  <unit name="bit"/>
+  <unit name="count"/>
+
+  <!-- Length -->
+  <unit name="angstrom" value="1e-10 * meter"/>
+  <unit name="inch" value="2.54 * centimeter">
+    <alias>in</alias>
+    <alias>international_inch</alias>
+    <alias>inches</alias>
+    <alias>international_inches</alias>
+  </unit>
+  <unit name="foot" value="12 * inch">
+    <alias>ft</alias>
+    <alias>international_foot</alias>
+    <alias>feet</alias>
+    <alias>international_feet</alias>
+  </unit>
+  <unit name="mile" value="5280 * foot">
+    <alias>mi</alias>
+    <alias>international_mile</alias>
+  </unit>
+  <unit name="yard" value="3 * feet">
+    <alias>yd</alias>
+    <alias>international_yard</alias>
+  </unit>
+  <unit name="mil" value="inch / 1000">
+    <alias>thou</alias>
+    <alias>inch</alias>
+  </unit>
+  <unit name="parsec" value="3.08568025e16 * meter">
+    <alias>pc</alias>
+  </unit>
+  <unit name="light_year" value="speed_of_light * julian_year">
+    <alias>ly</alias>
+    <alias>lightyear</alias>
+  </unit>
+  <unit name="astronomical_unit" value="149597870691 * meter">
+    <alias>au</alias>
+  </unit>
+  <unit name="nautical_mile" value="1.852e3 * meter">
+    <alias>nmi</alias>
+  </unit>
+  <unit name="printers_point" value="127 * millimeter / 360">
+    <alias>point</alias>
+  </unit>
+  <unit name="printers_pica" value="12 * printers_point">
+    <alias>pica</alias>
+  </unit>
+  <unit name="US_survey_foot" value="1200 * meter / 3937"/>
+  <unit name="US_survey_yard" value="3 * US_survey_foot"/>
+  <unit name="US_survey_mile" value="5280 * US_survey_foot">
+    <alias>US_statute_mile</alias>
+  </unit>
+  <unit name="rod" value="16.5 * US_survey_foot">
+    <alias>pole</alias>
+    <alias>perch</alias>
+  </unit>
+  <unit name="furlong" value="660 * US_survey_foot"/>
+  <unit name="fathom" value="6 * US_survey_foot"/>
+  <unit name="chain" value="66 * US_survey_foot"/>
+  <unit name="barleycorn" value="inch / 3"/>
+  <unit name="arpentlin" value="191.835 * feet"/>
+  <unit name="kayser" value="1 / centimeter">
+    <alias>wavenumber</alias>
+  </unit>
+  
+</ureg>
