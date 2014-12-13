@@ -58,10 +58,12 @@ classdef quantity < double
             end
         end
         function F = transpose(x)
-            F = Quantities.quantity(transpose@double(x.average),transpose(x.variance),x.units);
+            F = Quantities.quantity(transpose@double(x.average),...
+                transpose(x.variance),x.units);
         end
         function F = ctranspose(x)
-            F = Quantities.quantity(ctranspose@double(x.average),ctranspose(x.variance),x.units);
+            F = Quantities.quantity(ctranspose@double(x.average),...
+                ctranspose(x.variance),x.units);
         end
         function F = subsref(x,s)
          F = x;

@@ -1,0 +1,61 @@
+<!-- decimal prefixes -->
+<prefix name="yocto-" value="1e-24">
+<alias>y-</alias>
+</prefix>
+<prefix name="zepto-" value="1e-21">
+<alias>z-</alias>
+</prefix>
+<prefix name="atto-" value="1e-18">
+<alias>a-</alias>
+</prefix>
+<prefix name="femto-" value="1e-15">
+<alias>f-</alias>
+</prefix>
+<prefix name="pico-" value="1e-12">
+<alias>p-</alias>
+</prefix>
+<prefix name="nano-" value="1e-9">
+<alias>n-</alias>
+</prefix>
+<prefix name="micro-" value="1e-6">
+<alias>u-</alias>
+</prefix>
+<prefix name="milli-" value="1e-3">
+<alias>m-</alias>
+</prefix>
+<prefix name="centi-" value="1e-2">
+<alias>c-</alias>
+</prefix>
+<prefix name="deci-" value="1e-1">
+<alias>d-</alias>
+</prefix>
+<prefix name="deca-" value="1e+1">
+<alias>da-</alias>
+</prefix>
+<prefix name="hecto-" value="1e2">
+<alias>h-</alias>
+</prefix>
+<prefix name="kilo-" value="1e3">
+<alias>k-</alias>
+</prefix>
+<prefix name="mega-" value="1e6">
+<alias>M-</alias>
+</prefix>
+<prefix name="giga-" value="1e9">
+<alias>G-</alias>
+</prefix>
+<prefix name="tera-" value="1e12">
+<alias>T-</alias>
+</prefix>
+<prefix name="peta-" value="1e15">
+<alias>P-</alias>
+</prefix>
+<prefix name="exa-" value="1e18">
+<alias>E-</alias>
+</prefix>
+<prefix name="zetta-" value="1e21">
+<alias>Z-</alias>
+</prefix>
+<prefix name="yotta-" value="1e24">
+<alias>Y-</alias>
+</prefix>

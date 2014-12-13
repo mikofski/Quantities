@@ -2,6 +2,7 @@
 
 <!DOCTYPE doc [
 <!ENTITY constants SYSTEM "constants_en.xml">
+<!ENTITY prefixes SYSTEM "prefixes_en.xml">
 ]>
 
 <ureg>
@@ -66,7 +67,6 @@
   </unit>
   <unit name="mil" value="inch / 1000">
     <alias>thou</alias>
-    <alias>inch</alias>
   </unit>
   <unit name="parsec" value="3.08568025e16 * meter">
     <alias>pc</alias>
