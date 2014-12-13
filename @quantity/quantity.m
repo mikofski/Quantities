@@ -35,11 +35,11 @@ classdef quantity < double
                 fmtN = '%s, %g +/- %g [%s]';
                 dims = size(x);
                 % 1st row & column string
-                F = subsref(x,struct('type',{'()'},'subs',{{1,1}}));
+                F = subsref(x,substruct('()',{1,1}));
                 sc = sprintf(fmt1,F.average,F.stdev,F.units);
                 % 1st row string
                 for n = 2:dims(2)
-                    F = subsref(x,struct('type',{'()'},'subs',{{1,n}}));
+                    F = subsref(x,substruct('()',{1,n}));
                     sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
                 end
                 sr = sprintf('%s;\n',sc);
@@ -47,7 +47,7 @@ classdef quantity < double
                     F = subsref(x,struct('type',{'()'},'subs',{{m,1}}));
                     sc = sprintf(fmt1,F.average,F.stdev,F.units);
                     for n = 2:dims(2)
-                        F = subsref(x,struct('type',{'()'},'subs',{{m,n}}));
+                        F = subsref(x,substruct('()',{m,n}));
                         sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
                     end
                     sr = sprintf('%s%s;\n',sr,sc);
@@ -66,16 +66,20 @@ classdef quantity < double
                 ctranspose(x.variance),x.units);
         end
         function F = subsref(x,s)
-         F = x;
-         for s_ = s
-             switch s_.type
-                 case '.'
-                     F = F.(s_.subs);
-                 case '()'
-                     F = Quantities.quantity(subsref(F.average,s_), ...
-                         subsref(F.variance,s_),F.units);
-             end
-         end
+            F = x;
+            for s_ = s
+                if isa(F,'Quantities.quantity')
+                    switch s_.type
+                        case '.'
+                            F = F.(s_.subs);
+                        case '()'
+                            F = Quantities.quantity(subsref(F.average,s_), ...
+                                subsref(F.variance,s_),F.units);
+                    end
+                else
+                    F = subsref(F,s_);
+                end
+            end
         end
         function F = subsasgn(x,idx,y)
             F = Quantities.quantity(subsasgn(x.average,idx,y.average), ...
