@@ -9,8 +9,10 @@ classdef quantity < double
     methods
         function x = quantity(average,varargin)
             p = inputParser;
-            p.addRequired('average');
-            p.addOptional('variance',0,...
+            p.addRequired('average',...
+                @(arg)validateattributes(arg,{'numeric'},{'real','finite'},...
+                'quantity','average'));
+            p.addOptional('variance',zeros(size(average)),...
                 @(arg)validateattributes(arg,{'numeric'},...
                 {'real','finite','size',size(average),'nonnegative'},...
                 'quantity','variance'))
@@ -21,24 +23,34 @@ classdef quantity < double
             args = p.Results;
             x = x@double(args.average);
             x.average = double(x);
-            x.variance = abs(args.variance);
+            x.variance = args.variance;
             x.stdev = sqrt(x.variance);
             x.relative = x.stdev./x.average;
             x.units = args.units;
         end
         function disp(x)
-            if isscalar(x)
-                fprintf('\t%g +/- %g\n',x.average,x.stdev)
-            elseif ismatrix(x)
-                sr = '';
+            % DISP Display quantity.
+            if ismatrix(x)
+                fmt1 = '\t%g +/- %g [%s]';
+                fmtN = '%s, %g +/- %g [%s]';
                 dims = size(x);
-                for m = 1:dims(1)
-                    sc = sprintf('\t');
-                    for n = 1:dims(2)
+                % 1st row & column string
+                F = subsref(x,struct('type',{'()'},'subs',{{1,1}}));
+                sc = sprintf(fmt1,F.average,F.stdev,F.units);
+                % 1st row string
+                for n = 2:dims(2)
+                    F = subsref(x,struct('type',{'()'},'subs',{{1,n}}));
+                    sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
+                end
+                sr = sprintf('%s;\n',sc);
+                for m = 2:dims(1)
+                    F = subsref(x,struct('type',{'()'},'subs',{{m,1}}));
+                    sc = sprintf(fmt1,F.average,F.stdev,F.units);
+                    for n = 2:dims(2)
                         F = subsref(x,struct('type',{'()'},'subs',{{m,n}}));
-                        sc = sprintf('%s%g +/- %g, ',sc,F.average,F.stdev);
+                        sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
                     end
-                    sr = sprintf('%s%s\b\b;\n',sr,sc);
+                    sr = sprintf('%s%s;\n',sr,sc);
                 end
                 fprintf('%s',sr)
             else
@@ -46,10 +58,10 @@ classdef quantity < double
             end
         end
         function F = transpose(x)
-            F = Quantities.quantity(transpose@double(x),transpose(x.variance));
+            F = Quantities.quantity(transpose@double(x.average),transpose(x.variance),x.units);
         end
         function F = ctranspose(x)
-            F = Quantities.quantity(ctranspose@double(x),ctranspose(x.variance));
+            F = Quantities.quantity(ctranspose@double(x.average),ctranspose(x.variance),x.units);
         end
         function F = subsref(x,s)
          F = x;
@@ -59,23 +71,27 @@ classdef quantity < double
                      F = F.(s_.subs);
                  case '()'
                      F = Quantities.quantity(subsref(F.average,s_), ...
-                         subsref(F.variance,s_));
+                         subsref(F.variance,s_),F.units);
              end
          end
         end
         function F = subsasgn(x,idx,y)
             F = Quantities.quantity(subsasgn(x.average,idx,y.average), ...
-                subsasgn(x.variance,idx,y.variance));
+                subsasgn(x.variance,idx,y.variance),...
+                subsasgn(x.units,idx,y.units));
         end
         function F = horzcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
-            F = Quantities.quantity([avg_{:}],[var_{:}]);
+            units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
+            F = Quantities.quantity([avg_{:}],[var_{:}],[units_{:}]);
         end
         function F = vertcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
-            F = Quantities.quantity(vertcat(avg_{:}),vertcat(var_{:}));
+            units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
+            F = Quantities.quantity(vertcat(avg_{:}),vertcat(var_{:}),...
+                vertcat(units_{:}));
         end
         function F = cat(dim,varargin)
             if dim==1
