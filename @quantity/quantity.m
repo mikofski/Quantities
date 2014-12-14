@@ -32,11 +32,10 @@ classdef quantity < double
         function val = get.unit(x)
             val = Quantities.unitRegistry.DEFAULT(x.units);
         end
-        function disp(x)
-            % DISP Display quantity.
+        function F = to_string(x)
             if ismatrix(x)
-                fmt1 = '\t%g +/- %g [%s]';
-                fmtN = '%s, %g +/- %g [%s]';
+                fmt1 = '\t%g ± %g [%s]'; % char(177)
+                fmtN = '%s, %g ± %g [%s]';
                 dims = size(x);
                 % 1st row & column string
                 F = subsref(x,substruct('()',{1,1}));
@@ -48,7 +47,7 @@ classdef quantity < double
                 end
                 sr = sprintf('%s;\n',sc);
                 for m = 2:dims(1)
-                    F = subsref(x,struct('type',{'()'},'subs',{{m,1}}));
+                    F = subsref(x,substruct('()',{m,1}));
                     sc = sprintf(fmt1,F.average,F.stdev,F.units);
                     for n = 2:dims(2)
                         F = subsref(x,substruct('()',{m,n}));
@@ -56,7 +55,20 @@ classdef quantity < double
                     end
                     sr = sprintf('%s%s;\n',sr,sc);
                 end
-                fprintf('%s',sr)
+                F = sprintf('%s',sr);
+            else
+                dims = size(x);
+                dimstring = sprintf('%d',dims(1)); % char(215)
+                for dim = dims(2:end)
+                    dimstring = sprintf('%s×%d',dimstring,dim);
+                end
+                F = sprintf('Quantities.quantity <%s>\n',dimstring);
+            end
+        end
+        function disp(x)
+            % DISP Display quantity.
+            if ismatrix(x)
+                fprintf('%s',x.to_string);
             else
                 disp@double(x)
             end
@@ -70,43 +82,54 @@ classdef quantity < double
                 ctranspose(x.variance),x.units);
         end
         function F = subsref(x,s)
-            F = x;
-            for s_ = s
-                if isa(F,'Quantities.quantity')
-                    switch s_.type
-                        case '.'
-                            F = F.(s_.subs);
-                        case '()'
-                            F = Quantities.quantity(subsref(F.average,s_),...
-                                subsref(F.variance,s_),F.units);
+            switch s(1).type
+                case '.'
+                    F = subsref@double(x,s);
+                case '()'
+                    F = Quantities.quantity(subsref(x.average,s(1)),...
+                        subsref(x.variance,s(1)),x.units);
+                    if numel(s)>1
+                        F = subsref@double(F,s(2:end));
                     end
-                else
-                    F = subsref(F,s_);
-                end
             end
         end
         function F = subsasgn(x,s,y)
-            assert(x.unit.is_same_dimensionality(y.unit),...
-                'quantitySubsasgn.diffUnits',...
-                'In quantity subscript assignment units must be same type.')
-            F = Quantities.quantity(subsasgn(x.average,s,y.average),...
-                subsasgn(x.variance,s,y.variance),...
-                x.units);
+            switch s(1).type
+                case '.'
+                    F = subsasgn@double(x,s,y);
+                case '()'
+                    if numel(s)>1
+                        F = subsasgn@double(subsref(x,s(1)),s(2:end),y);
+                    else
+                        assert(x.unit.is_same_dimensionality(y.unit),...
+                            'quantity:dimensionalMismatch',...
+                            'In quantity subscript assignment units must be same dimensionality.')
+                        F = Quantities.quantity(subsasgn(x.average,s,y.average),...
+                            subsasgn(x.variance,s,y.variance),...
+                            x.units);
+                    end
+            end
         end
         function F = horzcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
             units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
             unit_ = cellfun(@(x)x.unit,varargin,'UniformOutput',false);
-            assert(unit_{1}.is_same_dimensionality([unit_{2:end}]))
+            assert(unit_{1}.is_same_dimensionality([unit_{2:end}]),...
+                'quantity:dimensionalMismatch',...
+                'In quantity horizontal concatenation units must be same dimensionality.')
             F = Quantities.quantity([avg_{:}],[var_{:}],units_{1});
         end
         function F = vertcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
             units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
+            unit_ = cellfun(@(x)x.unit,varargin,'UniformOutput',false);
+            assert(unit_{1}.is_same_dimensionality([unit_{2:end}]),...
+                'quantity:dimensionalMismatch',...
+                'In quantity vertical concatenation units must be same dimensionality.')
             F = Quantities.quantity(vertcat(avg_{:}),vertcat(var_{:}),...
-                vertcat(units_{:}));
+                units_{1});
         end
         function F = cat(dim,varargin)
             if dim==1
@@ -126,8 +149,8 @@ classdef quantity < double
             %         DX and DY.
             %
             % Returns:
-            %     quantity: 
-            % 
+            %     quantity:
+            %
             if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
                 F = Quantities.quantity(F,...
                     Fvar(x.average,y.average,x.variance,y.variance));
