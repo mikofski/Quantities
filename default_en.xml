@@ -11,29 +11,29 @@
   &constants;
 
   <!-- reference -->
-  <unit name="meter" type="length">
+  <unit name="meter" dimensionality="length">
     <alias>m</alias>
     <alias>metre</alias>
   </unit>
-  <unit name="second" type="time">
+  <unit name="second" dimensionality="time">
     <alias>s</alias>
     <alias>sec</alias>
   </unit>
-  <unit name="ampere" type="current">
+  <unit name="ampere" dimensionality="current">
     <alias>A</alias>
     <alias>amp</alias>
   </unit>
-  <unit name="candela" type="luminosity">
+  <unit name="candela" dimensionality="luminosity">
     <alias>cd</alias>
     <alias>candle</alias>
   </unit>
-  <unit name="gram" type="mass">
+  <unit name="gram" dimensionality="mass">
     <alias>g</alias>
   </unit>
-  <unit name="mole" type="substance">
+  <unit name="mole" dimensionality="substance">
     <alias>mol</alias>
   </unit>
-  <unit name="kelvin" type="temperature">
+  <unit name="kelvin" dimensionality="temperature">
     <alias>K</alias>
     <alias>degK</alias>
   </unit>

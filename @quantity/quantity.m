@@ -4,7 +4,8 @@ classdef quantity < double
         variance % second moment = trap(x,y^2 - average^2)/trap(x)
         stdev % standard deviation = sqrt(variance)
         relative % relative standard deviation = standard deviation / average
-        units
+        units % units
+        unit % unit class
     end
     methods
         function x = quantity(average,varargin)
@@ -27,6 +28,9 @@ classdef quantity < double
             x.stdev = sqrt(x.variance);
             x.relative = x.stdev./x.average;
             x.units = args.units;
+        end
+        function val = get.unit(x)
+            val = Quantities.unitRegistry.DEFAULT(x.units);
         end
         function disp(x)
             % DISP Display quantity.
@@ -73,7 +77,7 @@ classdef quantity < double
                         case '.'
                             F = F.(s_.subs);
                         case '()'
-                            F = Quantities.quantity(subsref(F.average,s_), ...
+                            F = Quantities.quantity(subsref(F.average,s_),...
                                 subsref(F.variance,s_),F.units);
                     end
                 else
@@ -81,16 +85,21 @@ classdef quantity < double
                 end
             end
         end
-        function F = subsasgn(x,idx,y)
-            F = Quantities.quantity(subsasgn(x.average,idx,y.average), ...
-                subsasgn(x.variance,idx,y.variance),...
-                subsasgn(x.units,idx,y.units));
+        function F = subsasgn(x,s,y)
+            assert(x.unit.is_same_dimensionality(y.unit),...
+                'quantitySubsasgn.diffUnits',...
+                'In quantity subscript assignment units must be same type.')
+            F = Quantities.quantity(subsasgn(x.average,s,y.average),...
+                subsasgn(x.variance,s,y.variance),...
+                x.units);
         end
         function F = horzcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
             units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
-            F = Quantities.quantity([avg_{:}],[var_{:}],[units_{:}]);
+            unit_ = cellfun(@(x)x.unit,varargin,'UniformOutput',false);
+            assert(unit_{1}.is_same_dimensionality([unit_{2:end}]))
+            F = Quantities.quantity([avg_{:}],[var_{:}],units_{1});
         end
         function F = vertcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
@@ -187,31 +196,31 @@ classdef quantity < double
         function F = sin(x)
             % F = sin(x)
             % dF^2 = cos(x)^2*dx^2
-            F = Quantities.quantity(sin@double(x), ...
+            F = Quantities.quantity(sin@double(x),...
                 cos(x.average).^2.*x.variance.^2);
         end
         function F = cos(x)
             % F = cos(x)
             % dF^2 = -sin(x)^2*dx^2
-            F = Quantities.quantity(cos@double(x), ...
+            F = Quantities.quantity(cos@double(x),...
                 (-sin(x.average)).^2.*x.variance.^2);
         end
         function F = log(x)
             % F = log(x)
             % dF^2 = (1/x)^2*dx^2
-            F = Quantities.quantity(log@double(x), ...
+            F = Quantities.quantity(log@double(x),...
                 1./x.average.^2.*x.variance.^2);
         end
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2))^2*dx^2
-            F = Quantities.quantity(log2@double(x), ...
+            F = Quantities.quantity(log2@double(x),...
                 1./(log(2)*x.average).^2.*x.variance.^2);
         end
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10))^2*dx^2
-            F = Quantities.quantity(log10@double(x), ...
+            F = Quantities.quantity(log10@double(x),...
                 1./(log(10)*x.average).^2.*x.variance.^2);
         end
     end
