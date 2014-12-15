@@ -4,18 +4,18 @@ classdef unit < double
         dimensionality % dimensionality
         value % SI equivalent value
         aliases
-        degree
         bases
         degrees = 1
+        DOF
     end
     methods
-        function u = unit(name,dimensionality,value,aliases,bases,degrees)
+        function u = unit(name,dimensionality,value,aliases)
             u = u@double(value);
             u.name = name;
             u.dimensionality = dimensionality;
             u.value = value;
             u.aliases = aliases;
-            
+            [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
         end
         function disp(u)
             F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,u.value.to_string);
@@ -75,7 +75,6 @@ classdef unit < double
         end
         function F = times(u,v)
             % element-by-element array multiplication
-            %% y is double, make new quantity with units
             if isa(u,'Quantities.unit') &&...
                     ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
                 F = Quantities.quantity(v,0,u.name);
@@ -88,41 +87,43 @@ classdef unit < double
         end
     end
     methods (Static)
-        function [basename,subexps] = parse_parentheses(u)
+        function [uname,subexps] = parse_parentheses(uname,subexps)
             % find parenthetic subexpressions
-            basename = u;
-            tks = {''};
-            subexps = {};
-            while ~isempty(tks)
-                [tks,starts,ends] = regexp(basename,'\(([\w +-*/^]*)\)',...
-                    'tokens','start','end');
-                subexps = [subexps,tks{1}]; %#ok<AGROW>
-                for n = 1:numel(tks)
-                    basename(starts(n):ends(n)) = ['@',num2str(n)];
-                end
+            if nargin<2
+                subexps = {};
             end
+            [tks,splits] = regexp(uname,'\(([@\w +-*/^]*)\)','tokens','split');
+            if isempty(tks)
+                return
+            end
+            m = numel(subexps);
+            subexps = [subexps,[tks{:}]];
+            uname = splits{1};
+            for n = 1:numel(tks)
+                uname = [uname,'@',num2str(m+n),splits{n+1}]; %#ok<AGROW>
+            end
+            [uname,subexps] = Quantities.unit.parse_parentheses(uname,subexps);
         end
-        function [bases, degrees] = parse_dimensions(u)
+        function [bases,degrees] = parse_dimensions(uname)
             % find dimensionality
-            [matches,splits] = regexp(u,'[*/]*','match','split');
+            [matches,splits] = regexp(uname,'[*/]*','match','split');
             if isempty(splits{1})
                 bases = {};
                 degrees = [];
                 return
+            end
+            sz = size(splits);
+            bases = cell(sz);
+            degrees = ones(sz);
+            tks = regexp(splits{1},'(\w+)\^((?<=\^)[.+-\d]+)','tokens');
+            if ~isempty(tks)
+                bases(1) = tks{1}(1);
+                degrees(1) = str2double(tks{1}{2});
             else
-                sz = size(splits);
-                bases = cell(sz);
-                degrees = ones(sz);
-                tks = regexp(splits{1},'(\w+)\^((?<=\^)[.+-\d]+)','tokens');
-                if ~isempty(tks)
-                    bases(1) = tks{1}(1);
-                    degrees(1) = str2double(tks{2}{1});
-                else
-                    bases(1) = splits(1);
-                end
+                bases(1) = splits(1);
             end
             for n = 1:numel(matches)
-                switch matches(n)
+                switch matches{n}
                     case '*'
                         numerator_denominator = 1;
                     case '/'
@@ -131,16 +132,41 @@ classdef unit < double
                 tks = regexp(splits{n+1},'(\w+)\^((?<=\^)[.+-\d]+)','tokens');
                 if ~isempty(tks)
                     bases(n+1) = tks{1}(1);
-                    degrees(n+1) = str2double(tks{2}{1})*numerator_denominator;
+                    degrees(n+1) = str2double(tks{1}{2})*numerator_denominator;
                 else
                     bases(n+1) = splits(n+1);
                     degrees(n+1) = numerator_denominator;
                 end
             end
         end
-        function [bases, degrees] = parse_name(u)
+        function [bases,degrees] = parse_name(uname)
             % parse units into base units and their degrees
-            [basename,subexps] = Quantities.unit.parse_parentheses(u);
+            [uname,subexps] = Quantities.unit.parse_parentheses(uname);
+            [bases,degrees] = Quantities.unit.parse_dimensions(uname);
+            next = cell(1,2);
+            for n = 1:numel(subexps)
+                if all(cellfun(@isempty,next))
+                    [subbases,subdegrees] = Quantities.unit.parse_dimensions(subexps{n});
+                else
+                    [subbases,subdegrees] = next{:};
+                end
+                idx = strcmp(['@',num2str(n)],bases);
+                if any(idx)
+                    bases(idx) = [];
+                    degree = degrees(idx);
+                    degrees(idx) = [];
+                    bases = [bases,subbases]; %#ok<AGROW>
+                    degrees = [degrees,subdegrees*degree]; %#ok<AGROW>
+                else
+                    [next{:}] = Quantities.unit.parse_dimensions(subexps{n+1});
+                    idx = strcmp(['@',num2str(n)],next{1});
+                    next{1}(idx) = [];
+                    degree = next{2}(idx);
+                    next{2}(idx) = [];
+                    next{1} = [next{1},subbases];
+                    next{2} = [next{2},subdegrees*degree];
+                end
+            end
         end
     end
 end
