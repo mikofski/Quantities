@@ -22,9 +22,9 @@ classdef quantity < double
                 'quantity','units'))
             p.parse(average,varargin{:});
             args = p.Results;
-            x = x@double(args.average);
+            x = x@double(args.average); % required for subclass of double
             x.average = double(x);
-            x.variance = args.variance;
+            x.variance = double(args.variance); % cast numeric as double
             x.stdev = sqrt(x.variance);
             x.relative = x.stdev./x.average;
             x.units = args.units;
@@ -74,11 +74,11 @@ classdef quantity < double
             end
         end
         function F = transpose(x)
-            F = Quantities.quantity(transpose@double(x.average),...
+            F = Quantities.quantity(transpose(x.average),...
                 transpose(x.variance),x.units);
         end
         function F = ctranspose(x)
-            F = Quantities.quantity(ctranspose@double(x.average),...
+            F = Quantities.quantity(ctranspose(x.average),...
                 ctranspose(x.variance),x.units);
         end
         function F = subsref(x,s)

@@ -3,14 +3,14 @@ classdef unit < double
         name
         dimensionality % dimensionality
         value % SI equivalent value
-        aliases
+        aliases = {}
         bases
         degrees = 1
         DOF
     end
     methods
         function u = unit(name,dimensionality,value,aliases)
-            u = u@double(value);
+            u = u@double(value); % required for subclass of double
             u.name = name;
             u.dimensionality = dimensionality;
             u.value = value;
@@ -19,8 +19,12 @@ classdef unit < double
         end
         function disp(u)
             F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,u.value.to_string);
-            G = sprintf(['(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
-                u.aliases{:});
+            if ~isempty(u.aliases)
+                G = sprintf(['(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
+                    u.aliases{:});
+            else
+                G = '';
+            end
             fprintf('%s%s',F,G)
         end
         function F = subsref(x,s)
@@ -74,7 +78,7 @@ classdef unit < double
             end
         end
         function F = times(u,v)
-            % element-by-element array multiplication
+            % TIMES Element-by-element array multiplication.
             if isa(u,'Quantities.unit') &&...
                     ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
                 F = Quantities.quantity(v,0,u.name);
@@ -82,7 +86,24 @@ classdef unit < double
                     ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
                 F = Quantities.quantity(u,0,v.name);
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
-                F = Quantities.unit();
+                if strcmp(u.name,v.name)
+                    uname = [u.name,'^',num2str(u.degrees+v.degrees)];
+                    sz = size(u.aliases);ualiases = cell(sz);
+                    for n = 1:prod(sz)
+                        ualiases{n} = [u.aliases{n},'^',num2str(u.degrees+v.degrees)];
+                    end
+                    F = Quantities.unit(uname,...
+                        [u.dimensionality,'^',num2str(u.degrees+v.degrees)],...
+                        Quantities.quantity(1,0,uname),ualiases);
+                else
+                    uname = [u.name,'*',v.name];
+                    F = Quantities.unit(uname,[u.dimensionality,'*',v.dimensionality],...
+                        Quantities.quantity(1,0,uname),{});
+                end
+            else
+                % u is a unit and v is a quantity
+                u = u.*v.unit;
+                F = Quantities.quantity(v.average,v.variance,u.name);
             end
         end
     end
@@ -100,7 +121,7 @@ classdef unit < double
             subexps = [subexps,[tks{:}]];
             uname = splits{1};
             for n = 1:numel(tks)
-                uname = [uname,'@',num2str(m+n),splits{n+1}]; %#ok<AGROW>
+                uname = [uname,'@',num2str(m+n),splits{n+1}];
             end
             [uname,subexps] = Quantities.unit.parse_parentheses(uname,subexps);
         end
@@ -155,8 +176,8 @@ classdef unit < double
                     bases(idx) = [];
                     degree = degrees(idx);
                     degrees(idx) = [];
-                    bases = [bases,subbases]; %#ok<AGROW>
-                    degrees = [degrees,subdegrees*degree]; %#ok<AGROW>
+                    bases = [bases,subbases];
+                    degrees = [degrees,subdegrees*degree];
                 else
                     [next{:}] = Quantities.unit.parse_dimensions(subexps{n+1});
                     idx = strcmp(['@',num2str(n)],next{1});
