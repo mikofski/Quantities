@@ -1,21 +1,28 @@
 classdef unit < double
     properties (SetAccess = immutable)
-        name
-        dimensionality % dimensionality
-        value % SI equivalent value
+        name = 'dimensionless'
+        dimensionality = [] % dimensionality
+        value = Quantities.quantity(1,0) % SI equivalent value
         aliases = {}
-        bases
-        degrees = 1
-        DOF
+        bases = {}
+        degrees = 0
+        DOF = 0
     end
     methods
         function u = unit(name,dimensionality,value,aliases)
+            if nargin<1
+                value = 1;
+            end
             u = u@double(value); % required for subclass of double
-            u.name = name;
-            u.dimensionality = dimensionality;
-            u.value = value;
-            u.aliases = aliases;
-            [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
+            if nargin>0
+                u.name = name;
+                u.dimensionality = dimensionality;
+                u.value = value;
+                [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
+            end
+            if nargin>3
+                u.aliases = aliases;
+            end
         end
         function disp(u)
             F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,char(u.value));
@@ -189,5 +196,8 @@ classdef unit < double
                 end
             end
         end
+    end
+    properties (Constant)
+        DIMENSIONLESS = Quantities.unit;
     end
 end
