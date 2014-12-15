@@ -5,6 +5,8 @@ classdef quantity < double
         stdev % standard deviation = sqrt(variance)
         relative % relative standard deviation = standard deviation / average
         units % units
+    end
+    properties (Dependent)
         unit % unit class
     end
     methods
@@ -32,7 +34,11 @@ classdef quantity < double
         function val = get.unit(x)
             val = Quantities.unitRegistry.DEFAULT(x.units);
         end
-        function F = to_string(x)
+        function set.unit(~,~)
+            error('quantity:setunit',...
+                'You cannot set the read-only property ''unit'' of quantity.')
+        end
+        function F = char(x)
             if ismatrix(x)
                 fmt1 = '\t%g ± %g [%s]'; % char(177)
                 fmtN = '%s, %g ± %g [%s]';
@@ -68,7 +74,7 @@ classdef quantity < double
         function disp(x)
             % DISP Display quantity.
             if ismatrix(x)
-                fprintf('%s',x.to_string);
+                fprintf('%s',char(x));
             else
                 disp@double(x)
             end

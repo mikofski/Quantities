@@ -18,7 +18,7 @@ classdef unit < double
             [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
         end
         function disp(u)
-            F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,u.value.to_string);
+            F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,char(u.value));
             if ~isempty(u.aliases)
                 G = sprintf(['(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
                     u.aliases{:});
