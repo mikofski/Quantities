@@ -8,6 +8,9 @@ classdef unit < double
         degrees = 0
         DOF = 0
     end
+    properties (Constant)
+        DIMENSIONLESS = Quantities.unit;
+    end
     methods
         function u = unit(name,dimensionality,value,aliases)
             if nargin<1
@@ -70,13 +73,40 @@ classdef unit < double
                 F(n) = varargin{n};
             end
         end
-        function F = is_same_dimensionality(u,v)
+        function F = ge(u,v)
+            % GREATER OR EQUAL Test unit dimensionality subset.
             if isscalar(u) && isscalar(v)
-                F = strcmp(u.dimensionality,v.dimensionality);
+                F = strcmp(u.dimensionality,v.dimensionality) ||...
+                    (u.is_dimensionless && v.is_dimensionless);
             elseif isscalar(u)
-                vdims = cellfun(@(x)x.dimensionality,v,'UniformOutput',false);
-                F = strcmp(u.dimensionality,vdims);
+                vdimensionality = cellfun(@(w)w.dimensionality,...
+                    v,'UniformOutput',false);
+                v_is_dimensionless = cellfun(@(w)w.is_dimensionless,...
+                    v,'UniformOutput',false);
+                F = strcmp(u.dimensionality,vdimensionality) ||...
+                    (u.is_dimensionless && all(v_is_dimensionless));
             end
+        end
+        function F = le(u,v)
+            F = u>=v;
+        end
+        function F = gt(u,v)
+            F = u>=v && u~=v;
+        end
+        function F = lt(u,v)
+            F = u>=v && u~=v;
+        end
+        function F = eq(u,v)
+            % EQUAL Test unit equality
+            if isscalar(u) && isscalar(v)
+                F = strcmp(u.name,v.name);
+            elseif isscalar(u)
+                vnames = cellfun(@(w)w.name,v,'UniformOutput',false);
+                F = strcmp(u.name,vnames);
+            end
+        end
+        function F = is_dimensionless(u)
+            F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
         end
         function F = convert(x,y)
             % CONVERT Convert units.
@@ -93,7 +123,13 @@ classdef unit < double
                     ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
                 F = Quantities.quantity(u,0,v.name);
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
-                if strcmp(u.name,v.name)
+                if u.is_dimensionless && ~v.is_dimensionless
+                    F = v;
+                elseif ~u.is_dimensionless && v.is_dimensionless
+                    F = u;
+                elseif u.is_dimensionless && v.is_dimensionless
+                    F = Quantities.unit.DIMENSIONLESS;
+                elseif strcmp(u.name,v.name)
                     uname = [u.name,'^',num2str(u.degrees+v.degrees)];
                     sz = size(u.aliases);ualiases = cell(sz);
                     for n = 1:prod(sz)
@@ -109,8 +145,14 @@ classdef unit < double
                 end
             else
                 % u is a unit and v is a quantity
-                u = u.*v.unit;
-                F = Quantities.quantity(v.average,v.variance,u.name);
+                if u.is_dimensionless && ~v.unit.is_dimensionless
+                    F = v;
+                elseif ~u.is_dimensionless && v.unit.is_dimensionless
+                    F = Quantities.quantity(v.average,v.variance,u.name);
+                else
+                    u = u.*v.unit;
+                    F = Quantities.quantity(v.average,v.variance,u.name);
+                end
             end
         end
     end
@@ -196,8 +238,5 @@ classdef unit < double
                 end
             end
         end
-    end
-    properties (Constant)
-        DIMENSIONLESS = Quantities.unit;
     end
 end
