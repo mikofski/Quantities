@@ -132,43 +132,32 @@ classdef quantity < double
                 F = horzcat(varargin{:});
             end
         end
-        function F = binop(x,y,F,Fvar)
-            % BINOP(X,Y,F,FVAR) Binary operation.
-            %
-            % Args
-            %     X (double): First argument.
-            %     Y (double): Second argument.
-            %     F (double): Return value.
-            %     FVAR (function handle): Calculates variance of F given X, Y,
-            %         DX and DY.
-            %
-            % Returns:
-            %     quantity:
-            %
-            if isa(x,'Quantities.quantity') && isa(y,'Quantities.quantity')
-                F = Quantities.quantity(F,...
-                    Fvar(x.average,y.average,x.variance,y.variance));
-            elseif isa(x,'Quantities.quantity')
-                F = Quantities.quantity(F,x.variance);
-            else
-                F = Quantities.quantity(F,y.variance);
-            end
-        end
         function F = plus(x,y)
             % F = x+y
             % dF^2 = dx.^2+dy.^2
-            F = binop(x,y,plus@double(x,y),@(x,y,dx,dy)dx.^2+dy.^2);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units+y.units; % FIXME!
+            F = Quantities.quantity(plus@double(x,y),...
+                x.variance+y.variance,unit);
         end
         function F = minus(x,y)
             % F = x-y
             % dF^2 = dx.^2-dy.^2
-            F = binop(x,y,minus@double(x,y),@(x,y,dx,dy)dx.^2-dy.^2);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units-y.units; % FIXME!
+            F = Quantities.quantity(minus@double(x,y),...
+                x.variance-y.variance,unit);
         end
         function F = times(x,y)
             % F = x.*y
             % dF^2 = y.^2.*dx.^2+x.^2.*dy.^2
-            F = binop(x,y,times@double(x,y),...
-                @(x,y,dx,dy)y.^2.*dx.^2+x.^2.*dy.^2);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units.*y.units; % FIXME!
+            F = Quantities.quantity(times@double(x,y),...
+                y.average.^2.*x.variance+x.average.^2.*y.variance,unit);
         end
         function F = mtimes(x,y)
             % F_ik = x_ij*y_jk = x_i1*y_1k + x_i2*y_2k + x_i3*y_3k
@@ -182,63 +171,88 @@ classdef quantity < double
                     end
                 end
             end
-            F = binop(x,y,mtimes@double(x,y),@Fvar);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units*y.units; % FIXME!
+            F = Quantities.quantity(mtimes@double(x,y),...
+                Fvar(x.average,y.average,x.stdev,y.stdev),unit);
         end
         function F = power(x,y)
             % F = x.^y
-            % dF^2 = y.^2.*dx.^2+x.^2.*dy.^2
-            F = binop(x,y,power@double(x,y),...
-                @(x,y,dx,dy)(y.*x.^(y-1)).^2.*dx.^2+(log(x).*x.^y).^2.*dy.^2);
+            % dF^2 = (y.*x.^(y-1)).^2.*dx.^2+(log(x).*x.^y).^2.*dy.^2)
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units.^y.units; % FIXME!
+            F = Quantities.quantity(power@double(x,y),...
+                (y.average.*x.average.^(y.average-1)).^2.*x.variance+...
+                (log(x.average).*x.average.^y.average).^2.*y.variance,unit);
         end
         function F = rdivide(x,y)
             % F = x./y
             % dF^2 = 1./y.^2.*dx.^2-x.^2./y.^4.*dy.^2
-            F = binop(x,y,rdivide@double(x,y),...
-                @(x,y,dx,dy)1./y.^2.*dx.^2-x.^2./y.^4.*dy.^2);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units./y.units; % FIXME!
+            F = Quantities.quantity(rdivide@double(x,y),...
+                1./y.average.^2.*x.variance-...
+                x.average.^2./y.average.^4.*y.variance,unit);
         end
         function F = ldivide(x,y)
             % F = x.\y = y./x
             % dF^2 = 1./x.^2.*dy.^2-y.^2./x.^4.*dx.^2
-            F = binop(x,y,ldivide@double(x,y),...
-                @(x,y,dx,dy)1./x.^2.*dy.^2-y.^2./x.^4.*dx.^2);
+            x = Quantities.quantity.as_quantity(x);
+            y = Quantities.quantity.as_quantity(y);
+            unit = x.units.\y.units; % FIXME!
+            F = Quantities.quantity(ldivide@double(x,y),...
+                1./x.average.^2.*y.variance-...
+                y.average.^2./x.average.^4.*x.variance,unit);
         end
         function F = uplus(x)
             % F = +x
-            F = Quantities.quantity(uplus@double(x),x.variance);
+            F = Quantities.quantity(uplus@double(x),x.variance,x.units);
         end
         function F = uminus(x)
             % F = -x
-            F = Quantities.quantity(uminus@double(x),x.variance);
+            F = Quantities.quantity(uminus@double(x),x.variance,x.units);
         end
         function F = sin(x)
             % F = sin(x)
             % dF^2 = cos(x)^2*dx^2
             F = Quantities.quantity(sin@double(x),...
-                cos(x.average).^2.*x.variance.^2);
+                cos(x.average).^2.*x.variance.^2,x.units);
         end
         function F = cos(x)
             % F = cos(x)
             % dF^2 = -sin(x)^2*dx^2
             F = Quantities.quantity(cos@double(x),...
-                (-sin(x.average)).^2.*x.variance.^2);
+                (-sin(x.average)).^2.*x.variance.^2,x.units);
         end
         function F = log(x)
             % F = log(x)
             % dF^2 = (1/x)^2*dx^2
             F = Quantities.quantity(log@double(x),...
-                1./x.average.^2.*x.variance.^2);
+                1./x.average.^2.*x.variance.^2,x.units);
         end
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2))^2*dx^2
             F = Quantities.quantity(log2@double(x),...
-                1./(log(2)*x.average).^2.*x.variance.^2);
+                1./(log(2)*x.average).^2.*x.variance.^2,x.units);
         end
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10))^2*dx^2
             F = Quantities.quantity(log10@double(x),...
-                1./(log(10)*x.average).^2.*x.variance.^2);
+                1./(log(10)*x.average).^2.*x.variance.^2,x.units);
+        end
+    end
+    methods (Static)
+        function F = as_quantity(x)
+            if isa(x,'Quantities.quantity')
+                F = x;
+            else
+                F = Quantities.quantity(x);
+            end
         end
     end
 end
