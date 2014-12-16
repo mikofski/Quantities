@@ -6,9 +6,6 @@ classdef quantity < double
         relative % relative standard deviation = standard deviation / average
         units % units
     end
-    properties (Dependent)
-        unit % unit class
-    end
     methods
         function x = quantity(average,varargin)
             p = inputParser;
@@ -19,8 +16,8 @@ classdef quantity < double
                 @(arg)validateattributes(arg,{'numeric'},...
                 {'real','finite','size',size(average),'nonnegative'},...
                 'quantity','variance'))
-            p.addOptional('units','dimensionless',...
-                @(arg)validateattributes(arg,{'char'},{'row'},...
+            p.addOptional('units',Quantities.unit.DIMENSIONLESS,...
+                @(arg)validateattributes(arg,{'Quantities.unit'},{'scalar'},...
                 'quantity','units'))
             p.parse(average,varargin{:});
             args = p.Results;
@@ -31,13 +28,6 @@ classdef quantity < double
             x.relative = x.stdev./x.average;
             x.units = args.units;
         end
-        function val = get.unit(x)
-            val = Quantities.unitRegistry.DEFAULT(x.units);
-        end
-        function set.unit(~,~)
-            error('quantity:setunit',...
-                'You cannot set the read-only property ''unit'' of quantity.')
-        end
         function F = char(x)
             if ismatrix(x)
                 fmt1 = '\t%g ± %g [%s]'; % char(177)
@@ -45,19 +35,19 @@ classdef quantity < double
                 dims = size(x);
                 % 1st row & column string
                 F = subsref(x,substruct('()',{1,1}));
-                sc = sprintf(fmt1,F.average,F.stdev,F.units);
+                sc = sprintf(fmt1,F.average,F.stdev,F.units.name);
                 % 1st row string
                 for n = 2:dims(2)
                     F = subsref(x,substruct('()',{1,n}));
-                    sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
+                    sc = sprintf(fmtN,sc,F.average,F.stdev,F.units.name);
                 end
                 sr = sprintf('%s;\n',sc);
                 for m = 2:dims(1)
                     F = subsref(x,substruct('()',{m,1}));
-                    sc = sprintf(fmt1,F.average,F.stdev,F.units);
+                    sc = sprintf(fmt1,F.average,F.stdev,F.units.name);
                     for n = 2:dims(2)
                         F = subsref(x,substruct('()',{m,n}));
-                        sc = sprintf(fmtN,sc,F.average,F.stdev,F.units);
+                        sc = sprintf(fmtN,sc,F.average,F.stdev,F.units.name);
                     end
                     sr = sprintf('%s%s;\n',sr,sc);
                 end
@@ -107,9 +97,9 @@ classdef quantity < double
                     if numel(s)>1
                         F = subsasgn@double(subsref(x,s(1)),s(2:end),y);
                     else
-                        assert(x.unit>=y.unit,...
+                        assert(x.units>=y.units,...
                             'quantity:dimensionalMismatch',...
-                            'In quantity subscript assignment units must be same dimensionality.')
+                            'Subscript assignment units must be same dimensionality.')
                         F = Quantities.quantity(subsasgn(x.average,s,y.average),...
                             subsasgn(x.variance,s,y.variance),...
                             x.units);
@@ -120,20 +110,18 @@ classdef quantity < double
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
             units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
-            unit_ = cellfun(@(x)x.unit,varargin,'UniformOutput',false);
-            assert(unit_{1}>=[unit_{2:end}],...
+            assert(units_{1}>=[units_{2:end}],...
                 'quantity:dimensionalMismatch',...
-                'In quantity horizontal concatenation units must be same dimensionality.')
+                'Horizontal concatenation units must be same dimensionality.')
             F = Quantities.quantity([avg_{:}],[var_{:}],units_{1});
         end
         function F = vertcat(varargin)
             avg_ = cellfun(@(x)x.average,varargin,'UniformOutput',false);
             var_ = cellfun(@(x)x.variance,varargin,'UniformOutput',false);
             units_ = cellfun(@(x)x.units,varargin,'UniformOutput',false);
-            unit_ = cellfun(@(x)x.unit,varargin,'UniformOutput',false);
-            assert(unit_{1}>=[unit_{2:end}],...
+            assert(units_{1}>=[units_{2:end}],...
                 'quantity:dimensionalMismatch',...
-                'In quantity vertical concatenation units must be same dimensionality.')
+                'Vertical concatenation units must be same dimensionality.')
             F = Quantities.quantity(vertcat(avg_{:}),vertcat(var_{:}),...
                 units_{1});
         end

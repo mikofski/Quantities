@@ -2,7 +2,7 @@ classdef unit < double
     properties (SetAccess = immutable)
         name = 'dimensionless'
         dimensionality = [] % dimensionality
-        value = Quantities.quantity(1,0) % SI equivalent value
+        value = 1 % SI equivalent value
         aliases = {}
         bases = {}
         degrees = 0
@@ -28,14 +28,19 @@ classdef unit < double
             end
         end
         function disp(u)
-            F = sprintf('%s [%s] =\n%s',u.name,u.dimensionality,char(u.value));
+            F = sprintf('\t%s [%s] =\n',u.name,u.dimensionality);
+            if isa(u.value,'Quantities.quantity')
+                H = sprintf('%s',char(u.value));
+            else
+                H = sprintf('\t%g [%s]\n',u.value,u.name);
+            end
             if ~isempty(u.aliases)
-                G = sprintf(['(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
+                G = sprintf(['\t(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
                     u.aliases{:});
             else
                 G = '';
             end
-            fprintf('%s%s',F,G)
+            fprintf('%s%s%s',F,H,G)
         end
         function F = subsref(x,s)
             switch s(1).type
@@ -118,10 +123,10 @@ classdef unit < double
             % TIMES Element-by-element array multiplication.
             if isa(u,'Quantities.unit') &&...
                     ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
-                F = Quantities.quantity(v,0,u.name);
+                F = Quantities.quantity(v,0,u);
             elseif isa(v,'Quantities.unit') &&...
                     ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
-                F = Quantities.quantity(u,0,v.name);
+                F = Quantities.quantity(u,0,v);
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
                 if u.is_dimensionless && ~v.is_dimensionless
                     F = v;
@@ -137,21 +142,21 @@ classdef unit < double
                     end
                     F = Quantities.unit(uname,...
                         [u.dimensionality,'^',num2str(u.degrees+v.degrees)],...
-                        Quantities.quantity(1,0,uname),ualiases);
+                        u.value.*v.value,ualiases);
                 else
                     uname = [u.name,'*',v.name];
                     F = Quantities.unit(uname,[u.dimensionality,'*',v.dimensionality],...
-                        Quantities.quantity(1,0,uname),{});
+                        u.value.*v.value,{});
                 end
             else
                 % u is a unit and v is a quantity
                 if u.is_dimensionless && ~v.unit.is_dimensionless
                     F = v;
                 elseif ~u.is_dimensionless && v.unit.is_dimensionless
-                    F = Quantities.quantity(v.average,v.variance,u.name);
+                    F = Quantities.quantity(v.average,v.variance,u);
                 else
                     u = u.*v.unit;
-                    F = Quantities.quantity(v.average,v.variance,u.name);
+                    F = Quantities.quantity(v.average,v.variance,u);
                 end
             end
         end
