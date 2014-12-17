@@ -170,6 +170,7 @@ classdef unit < double
                 end
                 F = F.*Quantities.unit(uname,udimensionality,1);
             end
+            F = F.*Quantities.unit('','',u.value,u.aliases);
         end
         function F = is_dimensionless(u)
             F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
