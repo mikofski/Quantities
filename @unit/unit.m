@@ -140,12 +140,12 @@ classdef unit < double
                 end
             else
                 % u is a unit and v is a quantity
-                if u.is_dimensionless && ~v.unit.is_dimensionless
+                if u.is_dimensionless && ~v.units.is_dimensionless
                     F = v;
-                elseif ~u.is_dimensionless && v.unit.is_dimensionless
+                elseif ~u.is_dimensionless && v.units.is_dimensionless
                     F = Quantities.quantity(v.average,v.variance,u);
                 else
-                    u = u.*v.unit;
+                    u = u.*v.units;
                     F = Quantities.quantity(v.average,v.variance,u);
                 end
             end
@@ -156,12 +156,14 @@ classdef unit < double
             for b = unique(u.bases)
                 idx = strcmp(b,u.bases);
                 degree = sum(u.degrees(idx));
-                if degree==1
+                if degree==0
+                    continue
+                elseif degree==1
                     uname = b{1};
                 else
                     uname = [b{1},'^',num2str(degree)];
                 end
-                F = F*unit(uname,'',1,{});
+                F = Quantities.unit(uname,'',1,{}).*F;
             end
         end
         function F = is_dimensionless(u)
