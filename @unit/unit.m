@@ -6,7 +6,6 @@ classdef unit < double
         aliases = {}
         bases = {}
         degrees = 0
-        DOF = 0
     end
     properties (Constant)
         DIMENSIONLESS = Quantities.unit;
@@ -110,15 +109,6 @@ classdef unit < double
                 F = strcmp(u.name,vnames);
             end
         end
-        function F = is_dimensionless(u)
-            F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
-        end
-        function F = convert(x,y)
-            % CONVERT Convert units.
-            if x.is_same_dimensionality(y)
-                F = x;
-            end
-        end
         function F = times(u,v)
             % TIMES Element-by-element array multiplication.
             if isa(u,'Quantities.unit') &&...
@@ -158,6 +148,29 @@ classdef unit < double
                     u = u.*v.unit;
                     F = Quantities.quantity(v.average,v.variance,u);
                 end
+            end
+        end
+        function F = combine(u)
+            % COMBINE Combine units.
+            F = 1;
+            for b = unique(u.bases)
+                idx = strcmp(b,u.bases);
+                degree = sum(u.degrees(idx));
+                if degree==1
+                    uname = b{1};
+                else
+                    uname = [b{1},'^',num2str(degree)];
+                end
+                F = F*unit(uname,'',1,{});
+            end
+        end
+        function F = is_dimensionless(u)
+            F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
+        end
+        function F = convert(x,y)
+            % CONVERT Convert units.
+            if x>=y % check dimensionality
+                F = x;
             end
         end
     end
