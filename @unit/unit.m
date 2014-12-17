@@ -6,6 +6,7 @@ classdef unit < double
         aliases = {}
         bases = {}
         degrees = 0
+        dimensions = {}
     end
     properties (Constant)
         DIMENSIONLESS = Quantities.unit;
@@ -21,6 +22,7 @@ classdef unit < double
                 u.dimensionality = dimensionality;
                 u.value = value;
                 [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
+                [u.dimensions,~] = Quantities.unit.parse_name(u.dimensionality);
             end
             if nargin>3
                 u.aliases = aliases;
@@ -152,18 +154,21 @@ classdef unit < double
         end
         function F = combine(u)
             % COMBINE Combine units.
-            F = 1;
+            F = Quantities.unit.DIMENSIONLESS;
             for b = unique(u.bases)
                 idx = strcmp(b,u.bases);
                 degree = sum(u.degrees(idx));
+                udim = u.dimensions{idx};
                 if degree==0
                     continue
                 elseif degree==1
                     uname = b{1};
+                    udimensionality = udim;
                 else
                     uname = [b{1},'^',num2str(degree)];
+                    udimensionality = [udim,'^',num2str(degree)];
                 end
-                F = Quantities.unit(uname,'',1,{}).*F;
+                F = F.*Quantities.unit(uname,udimensionality,1);
             end
         end
         function F = is_dimensionless(u)
