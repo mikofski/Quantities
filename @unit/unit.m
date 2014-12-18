@@ -111,14 +111,50 @@ classdef unit < double
                 F = strcmp(u.name,vnames);
             end
         end
+        function F = plus(u,v)
+            if isa(u,'Quantities.unit') && u.is_dimensionless &&...
+                    ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
+                F = Quantities.quantity(1+v,0,Quantities.unit.DIMENSIONLESS);
+            elseif isa(v,'Quantities.unit') && v.is_dimensionless &&...
+                    ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
+                F = Quantities.quantity(1+u,0,Quantities.unit.DIMENSIONLESS);
+            elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
+                if u==v
+                    F = Quantities.quantity(2,0,u);
+                elseif u>v
+                    F = u+v;
+                else
+                    error('unit:incompatibleUnits',...
+                        'Units must have same dimensionality for addition.')
+                end
+            else
+                % u is a unit and v is a quantity
+                if u==v.units
+                    F = Quantities.quantity(1,0,u)+v;
+                elseif u>v.units
+                    F = u.value+v.to_base;
+                else
+                    error('unit:incompatibleUnits',...
+                        'Units must have same dimensionality for addition.')
+                end
+            end
+        end
         function F = times(u,v)
             % TIMES Element-by-element array multiplication.
             if isa(u,'Quantities.unit') &&...
                     ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
-                F = Quantities.quantity(v,0,u);
+                if v==1
+                    F = u;
+                else
+                    F = Quantities.quantity(v,0,u);
+                end
             elseif isa(v,'Quantities.unit') &&...
                     ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
-                F = Quantities.quantity(u,0,v);
+                if u==1
+                    F = v;
+                else
+                    F = Quantities.quantity(u,0,v);
+                end
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
                 if u.is_dimensionless && ~v.is_dimensionless
                     F = v;
@@ -126,7 +162,7 @@ classdef unit < double
                     F = u;
                 elseif u.is_dimensionless && v.is_dimensionless
                     F = Quantities.unit.DIMENSIONLESS;
-                elseif strcmp(u.name,v.name)
+                elseif u==v
                     uname = [u.name,'^',num2str(u.degrees+v.degrees)];
                     sz = size(u.aliases);ualiases = cell(sz);
                     for n = 1:prod(sz)
@@ -152,6 +188,49 @@ classdef unit < double
                 end
             end
         end
+        function F = rdivide(u,v)
+            % RDIVIDE Units division.
+            if isa(u,'Quantities.unit') &&...
+                    ~(isa(v,'Quantities.unit') || isa(v,'Quantities.quantity'))
+                if v==1
+                    F = u;
+                else
+                    F = Quantities.quantity(1./v,0,u);
+                end
+            elseif isa(v,'Quantities.unit') &&...
+                    ~(isa(u,'Quantities.unit') || isa(u,'Quantities.quantity'))
+                sz = size(v.aliases);ualiases = cell(sz);
+                for n = 1:prod(sz)
+                    ualiases{n} = [v.aliases{n},'^-1'];
+                end
+                F = u.*Quantities.unit([v.name,'^-1'],[v.dimensionality,'^-1'],...
+                    1./v.value,ualiases);
+            elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
+                if u.is_dimensionless && ~v.is_dimensionless
+                    F = 1./v;
+                elseif ~u.is_dimensionless && v.is_dimensionless
+                    F = u;
+                elseif u.is_dimensionless && v.is_dimensionless
+                    F = Quantities.unit.DIMENSIONLESS;
+                elseif u==v
+                    uname = [u.name,'^',num2str(u.degrees-v.degrees)];
+                    sz = size(u.aliases);ualiases = cell(sz);
+                    for n = 1:prod(sz)
+                        ualiases{n} = [u.aliases{n},'^',num2str(u.degrees-v.degrees)];
+                    end
+                    F = Quantities.unit(uname,...
+                        [u.dimensionality,'^',num2str(u.degrees-v.degrees)],...
+                        u.value.*v.value,ualiases);
+                else
+                    uname = [u.name,'/',v.name];
+                    F = Quantities.unit(uname,[u.dimensionality,'/',v.dimensionality],...
+                        u.value./v.value,{});
+                end
+            else
+                % u is a unit and v is a quantity
+                F = 1./v.*u;
+            end
+        end
         function F = combine(u)
             % COMBINE Combine units.
             F = Quantities.unit.DIMENSIONLESS;
@@ -170,7 +249,7 @@ classdef unit < double
                 end
                 F = F.*Quantities.unit(uname,udimensionality,1);
             end
-            F = F.*Quantities.unit('','',u.value,u.aliases);
+            F = Quantities.unit(F.name,F.dimensionality,u.value,u.aliases);
         end
         function F = is_dimensionless(u)
             F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);

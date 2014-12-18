@@ -245,11 +245,20 @@ classdef quantity < double
             F = Quantities.quantity(log10@double(x),...
                 1./(log(10)*x.average).^2.*x.variance.^2,x.units);
         end
+        function F = to_base(x)
+            F = x.units.value.*x./x.units;
+            F = F.combine_units;
+        end
+        function F = combine_units(x)
+            F = Quantities.quantity(x.average,x.variance,x.units.combine);
+        end
     end
     methods (Static)
         function F = as_quantity(x)
             if isa(x,'Quantities.quantity')
                 F = x;
+            elseif isa(x,'Quantities.unit')
+                F = Quantities.quantity(1,0,x);
             else
                 F = Quantities.quantity(x);
             end
