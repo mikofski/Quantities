@@ -239,10 +239,10 @@ classdef unit < double
                     F = u; % v is dimensionless
                 elseif u.is_dimensionless && v.is_dimensionless
                     F = Quantities.unit.DIMENSIONLESS; % both dimensionless
-                elseif u==v
+%                 elseif u==v
                     % units are exactly the same
-                    F = [u,v]; % concatentate bases, dimensions and degrees
-                    F = F.combine; % combine units
+%                     F = [u,v]; % concatentate bases, dimensions and degrees
+%                     F = F.combine; % combine units
 %                     uname = [u.name,'^',num2str(u.degrees+v.degrees)];
 %                     sz = size(u.aliases);ualiases = cell(sz);
 %                     for n = 1:prod(sz)
@@ -252,7 +252,7 @@ classdef unit < double
 %                         [u.dimensionality,'^',num2str(u.degrees+v.degrees)],...
 %                         u.value.*v.value,ualiases);
                 else
-                    uname = [u.name,'*',v.name];
+                    uname = ['(',u.name,')*(',v.name,')'];
                     if u.value==1 && v.value==1
                         F = Quantities.unit(uname,[u.dimensionality,'*',v.dimensionality],...
                             1);
@@ -266,6 +266,7 @@ classdef unit < double
                         F = Quantities.unit(uname,[u.dimensionality,'*',v.dimensionality],...
                             u.value.*v.value);
                     end
+%                     F = F.combine; % combine units
                 end
             else
                 % u is a unit and v is a quantity
@@ -311,10 +312,10 @@ classdef unit < double
                     F = u;
                 elseif u.is_dimensionless && v.is_dimensionless
                     F = Quantities.unit.DIMENSIONLESS;
-                elseif u==v
+%                 elseif u==v
                     % units are exactly the same
-                    F = [u;v]; % concatentate bases, dimensions and degrees
-                    F = F.combine; % combine units
+%                     F = [u;v]; % concatentate bases, dimensions and degrees
+%                     F = F.combine; % combine units
 %                     uname = [u.name,'^',num2str(u.degrees-v.degrees)];
 %                     sz = size(u.aliases);ualiases = cell(sz);
 %                     for n = 1:prod(sz)
@@ -324,7 +325,7 @@ classdef unit < double
 %                         [u.dimensionality,'^',num2str(u.degrees-v.degrees)],...
 %                         u.value.*v.value,ualiases);
                 else
-                    uname = [u.name,'/(',v.name,')'];
+                    uname = ['(',u.name,')/(',v.name,')'];
                     if u.value==1 && v.value==1
                         F = Quantities.unit(uname,[u.dimensionality,'/(',v.dimensionality,')'],...
                             1);
@@ -338,6 +339,7 @@ classdef unit < double
                         F = Quantities.unit(uname,[u.dimensionality,'/(',v.dimensionality,')'],...
                             u.value./v.value);
                     end
+%                     F = F.combine; % combine units
                 end
             else
                 % u is a unit and v is a quantity

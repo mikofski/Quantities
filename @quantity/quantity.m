@@ -27,7 +27,7 @@ classdef quantity < double
             args = p.Results;
             x = x@double(args.average); % required for subclass of double
             x.average = double(x);
-            if strcmp('variance',p.UsingDefaults)
+            if any(strcmp('variance',p.UsingDefaults))
                 x.stdev = double(args.stdev); % cast numeric as double
                 x.variance = x.stdev.^2;
             else
@@ -244,7 +244,7 @@ classdef quantity < double
         function F = log(x)
             % F = log(x)
             % dF^2 = (1/x.*dx).^2
-            assert(x.units.is_dimensionless,'quantity:power',...
+            assert(x.units.is_dimensionless,'quantity:log',...
                 'Logarithm must be dimensionless.')
             F = Quantities.quantity(log@double(x),'units',x.units,...
                 'variance',1./x.average.^2.*x.variance);
@@ -252,7 +252,7 @@ classdef quantity < double
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2).*dx).^2
-            assert(x.units.is_dimensionless,'quantity:power',...
+            assert(x.units.is_dimensionless,'quantity:log',...
                 'Logarithm must be dimensionless.')
             F = Quantities.quantity(log2@double(x),'units',x.units,...
                 'variance',1./(log(2)*x.average).^2.*x.variance);
@@ -260,7 +260,7 @@ classdef quantity < double
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10).*dx).^2
-            assert(x.units.is_dimensionless,'quantity:power',...
+            assert(x.units.is_dimensionless,'quantity:log',...
                 'Logarithm must be dimensionless.')
             F = Quantities.quantity(log10@double(x),'units',x.units,...
                 'variance',1./(log(10)*x.average).^2.*x.variance);
