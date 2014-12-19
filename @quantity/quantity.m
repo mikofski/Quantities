@@ -146,8 +146,8 @@ classdef quantity < double
             % dF^2 = (1*dx).^2+(1*dy).^2
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
-            unit = x.units+y.units; % combine units
-            F = Quantities.quantity(plus@double(x,y),'units',unit,...
+            x = x.to_base;y = y.to_base;
+            F = Quantities.quantity(plus@double(x,y),'units',x.units,...
                 'variance',x.variance+y.variance);
         end
         function F = minus(x,y)
@@ -155,8 +155,8 @@ classdef quantity < double
             % dF^2 = (1*dx).^2+(-1*dy).^2
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
-            unit = x.units-y.units; % combine units
-            F = Quantities.quantity(minus@double(x,y),'units',unit,...
+            x = x.to_base;y = y.to_base;
+            F = Quantities.quantity(minus@double(x,y),'units',x.units,...
                 'variance',x.variance+y.variance); % (-1)^2 = 1
         end
         function F = times(x,y)
@@ -191,8 +191,9 @@ classdef quantity < double
             % dF^2 = (y.*x.^(y-1).*dx).^2+(log(x).*x.^y.*dy).^2)
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
-            unit = x.units.^y.units; % combine units
-            F = Quantities.quantity(power@double(x,y),'units',unit,'variance',...
+            assert(y.units.is_dimensionless,'quantity:power',...
+                'Power must be dimensionless.')
+            F = Quantities.quantity(power@double(x,y),'units',x.units,'variance',...
                 (y.average.*x.average.^(y.average-1)).^2.*x.variance+...
                 (log(x.average).*x.average.^y.average).^2.*y.variance);
         end
@@ -227,30 +228,40 @@ classdef quantity < double
         function F = sin(x)
             % F = sin(x)
             % dF^2 = (cos(x).*dx).^2
+            assert(strcmp(x.units.dimensionality,'angle'),'quantity:sin',...
+                'Sine argument must be an angle.')
             F = Quantities.quantity(sin@double(x),'units',x.units,...
                 'variance',cos(x.average).^2.*x.variance);
         end
         function F = cos(x)
             % F = cos(x)
             % dF^2 = (-sin(x).*dx).^2
+            assert(strcmp(x.units.dimensionality,'angle'),'quantity:sin',...
+                'Cosine argument must be an angle.')
             F = Quantities.quantity(cos@double(x),'units',x.units,...
                 'variance',sin(x.average).^2.*x.variance); % (-1)^2 = 1
         end
         function F = log(x)
             % F = log(x)
             % dF^2 = (1/x.*dx).^2
+            assert(x.units.is_dimensionless,'quantity:power',...
+                'Logarithm must be dimensionless.')
             F = Quantities.quantity(log@double(x),'units',x.units,...
                 'variance',1./x.average.^2.*x.variance);
         end
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2).*dx).^2
+            assert(x.units.is_dimensionless,'quantity:power',...
+                'Logarithm must be dimensionless.')
             F = Quantities.quantity(log2@double(x),'units',x.units,...
                 'variance',1./(log(2)*x.average).^2.*x.variance);
         end
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10).*dx).^2
+            assert(x.units.is_dimensionless,'quantity:power',...
+                'Logarithm must be dimensionless.')
             F = Quantities.quantity(log10@double(x),'units',x.units,...
                 'variance',1./(log(10)*x.average).^2.*x.variance);
         end
