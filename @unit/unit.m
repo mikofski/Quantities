@@ -181,14 +181,6 @@ classdef unit < double
             else
                 % u is a unit and v is a quantity
                 F = v.*u;
-%                 if u.is_dimensionless && ~v.units.is_dimensionless
-%                     F = v;
-%                 elseif ~u.is_dimensionless && v.units.is_dimensionless
-%                     F = Quantities.quantity(v.average,v.stdev,u);
-%                 else
-%                     u = u.*v.units;
-%                     F = Quantities.quantity(v.average,v.stdev,u);
-%                 end
             end
         end
         function F = rdivide(u,v)
