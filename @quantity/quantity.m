@@ -88,20 +88,21 @@ classdef quantity < double
         end
         function F = subsref(x,s)
             switch s(1).type
-                case '.'
-                    F = subsref@double(x,s);
                 case '()'
                     F = Quantities.quantity(subsref(x.average,s(1)),...
                         subsref(x.stdev,s(1)),x.units);
                     if numel(s)>1
                         F = subsref@double(F,s(2:end));
                     end
+                case '{}'
+                    s(1).type = '()';
+                    F = subsref(x.average,s);
+                otherwise
+                    F = subsref@double(x,s);
             end
         end
         function F = subsasgn(x,s,y)
             switch s(1).type
-                case '.'
-                    F = subsasgn@double(x,s,y);
                 case '()'
                     if numel(s)>1
                         F = subsasgn@double(subsref(x,s(1)),s(2:end),y);
@@ -113,6 +114,12 @@ classdef quantity < double
                             subsasgn(x.stdev,s,y.stdev),...
                             x.units);
                     end
+                case '{}'
+                    s(1).type = '()';
+                    F = Quantities.quantity(subsasgn(x.average,s,y),...
+                        x.stdev,x.units);
+                otherwise
+                    F = subsasgn@double(x,s,y);
             end
         end
         function F = horzcat(varargin)
@@ -236,7 +243,7 @@ classdef quantity < double
         function F = cos(x)
             % F = cos(x)
             % dF^2 = (-sin(x).*dx).^2
-            assert(strcmp(x.units.dimensionality,'angle'),'quantity:sin',...
+            assert(strcmp(x.units.dimensionality,'angle'),'quantity:cos',...
                 'Cosine argument must be an angle.')
             F = Quantities.quantity(cos@double(x),'units',x.units,...
                 'variance',sin(x.average).^2.*x.variance); % (-1)^2 = 1
@@ -252,7 +259,7 @@ classdef quantity < double
         function F = log2(x)
             % F = log(x)
             % dF^2 = (1/x/log(2).*dx).^2
-            assert(x.units.is_dimensionless,'quantity:log',...
+            assert(x.units.is_dimensionless,'quantity:log2',...
                 'Logarithm must be dimensionless.')
             F = Quantities.quantity(log2@double(x),'units',x.units,...
                 'variance',1./(log(2)*x.average).^2.*x.variance);
@@ -260,7 +267,7 @@ classdef quantity < double
         function F = log10(x)
             % F = log(x)
             % dF^2 = (1/x/log(10).*dx).^2
-            assert(x.units.is_dimensionless,'quantity:log',...
+            assert(x.units.is_dimensionless,'quantity:log10',...
                 'Logarithm must be dimensionless.')
             F = Quantities.quantity(log10@double(x),'units',x.units,...
                 'variance',1./(log(10)*x.average).^2.*x.variance);

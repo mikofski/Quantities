@@ -56,6 +56,22 @@ classdef unit < double
             fprintf('%s%s%s',F,H,G)
         end
         % no subsref or subsasgn
+        function F = subsref(u,s)
+            switch s(1).type
+                case {'()','{}'}
+                    error('unit:subsref','Unit is scalar - do not index Unit.')
+                otherwise
+                    F = subsref@double(u,s);
+            end
+        end
+        function F = subsasgn(u,s,v)
+            switch s(1).type
+                case {'()','{}'}
+                    error('unit:subsasgn','Unit is scalar - do not index Unit.')
+                otherwise
+                    F = subsasgn@double(u,s,v);
+            end
+        end
         % no horzcat, vertcat or cat
         function F = ge(u,v)
             % GREATER OR EQUAL Test unit dimensionality subset.
@@ -234,8 +250,11 @@ classdef unit < double
                 end
             else
                 % u is a unit and v is a quantity
-                F = 1./v.*u;
+                F = v.\u; % = 1./v.*u;
             end
+        end
+        function F = ldivide(u,v)
+            F = v./u;
         end
         function F = combine(u)
             % COMBINE Combine units.
@@ -258,9 +277,13 @@ classdef unit < double
                     udimensionality{jdx} = [udim,'^',num2str(degree)];
                 end
             end
-            uname = strjoin(uname,'*');
-            udimensionality = strjoin(udimensionality,'*');
-            F = Quantities.unit(uname,udimensionality,u.value,u.aliases);
+            if iscellstr(uname)
+                uname = strjoin(uname,'*');
+                udimensionality = strjoin(udimensionality,'*');
+                F = Quantities.unit(uname,udimensionality,u.value,u.aliases);
+            else
+                F = Quantities.unit.DIMENSIONLESS;
+            end
         end
         function F = is_dimensionless(u)
             F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
