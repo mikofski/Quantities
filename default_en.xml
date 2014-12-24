@@ -7,9 +7,6 @@
 
 <ureg>
 
-  <!-- constants -->
-  &constants;
-
   <!-- reference -->
   <unit name="meter" dimensionality="length">
     <alias>m</alias>
@@ -42,6 +39,12 @@
   </unit>
   <unit name="bit"/>
   <unit name="count"/>
+
+  <!-- constants -->
+  &constants;
+
+  <!-- prefixes -->
+  &prefixes;
 
   <!-- Length -->
   <unit name="angstrom" value="1e-10 * meter"/>

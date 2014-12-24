@@ -1,7 +1,7 @@
 classdef unit < double
     properties (SetAccess = immutable)
         name = 'dimensionless'
-        dimensionality = [] % dimensionality
+        dimensionality = '' % dimensionality
         value = 1 % SI equivalent value
         aliases = {}
         bases = {}
@@ -20,9 +20,11 @@ classdef unit < double
             if nargin>0
                 validateattributes(name,{'char'},{'row'},'unit','name',1)
                 u.name = name;
-                validateattributes(dimensionality,{'char'},{'row'},'unit',...
-                    'dimensionality',2)
-                u.dimensionality = dimensionality;
+                if ~isempty(dimensionality)
+                    validateattributes(dimensionality,{'char'},{'row'},'unit',...
+                        'dimensionality',2)
+                    u.dimensionality = dimensionality;
+                end
                 validateattributes(value,{'Quantities.quantity','numeric'},...
                     {'scalar'},'unit','value',3)
                 if ~isa(value,'Quantities.quantity')
@@ -255,6 +257,21 @@ classdef unit < double
         end
         function F = ldivide(u,v)
             F = v./u;
+        end
+        function F = mtimes(u,v)
+            F = u.*v;
+        end
+        function F = mrdivide(u,v)
+            F = u./v;
+        end
+        function F = mldivide(u,v)
+            F = u.\v;
+        end
+        function F = power(u,n)
+            F = 1;
+            for m = 1:n
+                F = F.*u;
+            end
         end
         function F = combine(u)
             % COMBINE Combine units.
