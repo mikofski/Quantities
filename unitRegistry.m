@@ -1,6 +1,9 @@
 classdef unitRegistry < containers.Map
     properties
         unitsfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
+        prefixes = {} % cell string of prefixes keys
+        units = {} % cell string of units keys
+        constants = {} % cell string of constants keys
     end
     properties (Constant)
         DEFAULT = Quantities.unitRegistry
@@ -86,6 +89,13 @@ classdef unitRegistry < containers.Map
                 otherwise
                     F = subsref@containers.Map(ureg,s);
             end
+        end
+    end
+    methods (Static)
+        function reg_parser(xnode,attr_list)
+        % REG_PARSER Parser for registry files
+        %
+        % :param xnode: 
         end
     end
 end
