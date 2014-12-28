@@ -50,7 +50,7 @@ classdef unitRegistry < containers.Map
                             val = strtrim(v{vi});
                             try
                                 val = subsref(ureg,substruct('()',val));
-                            catch 
+                            catch ME
                                 if strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                                     rethrow(ME)
                                 end
@@ -92,10 +92,18 @@ classdef unitRegistry < containers.Map
         end
     end
     methods (Static)
-        function reg_parser(xnode,attr_list)
+        function reg_parser(xroot,tagname,attrs)
         % REG_PARSER Parser for registry files
         %
-        % :param xnode: 
+        % :param xroot: root node of xml file
+        % :param tagname: tag name to parse
+        % :param attrs: structure of attributes and defaults
+        xnodes = xroot.getElementsByTagName(tagname);
+            for i = 0:xnodes.getLength-1
+                xnode = xnodes.item(i);
+                for attr = attrs
+                end
+            end
         end
     end
 end
