@@ -61,7 +61,7 @@ classdef unitRegistry < containers.Map
                         value = value.*val.^d(vi);
                     end
                 end
-                unit = Quantities.unit(name, dimensionality,value,aliases);
+                unit = Quantities.unit(name,dimensionality,value,aliases);
                 subsasgn(ureg,substruct('()',{name}),unit);
             end
         end
@@ -90,18 +90,23 @@ classdef unitRegistry < containers.Map
                     F = subsref@containers.Map(ureg,s);
             end
         end
-    end
-    methods (Static)
-        function reg_parser(xroot,tagname,attrs)
+        function reg_parser(ureg,xroot,tagname,attrs)
         % REG_PARSER Parser for registry files
         %
         % :param xroot: root node of xml file
         % :param tagname: tag name to parse
         % :param attrs: structure of attributes and defaults
+        
         xnodes = xroot.getElementsByTagName(tagname);
             for i = 0:xnodes.getLength-1
                 xnode = xnodes.item(i);
                 for attr = attrs
+                    retv = xnode.getAttribute(attr.name);
+                    if retv.isEmpty
+                        retv = attr.default
+                    else
+                        retv = attr.hook
+                    end
                 end
             end
         end
