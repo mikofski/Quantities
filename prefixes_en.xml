@@ -19,6 +19,7 @@
 </prefix>
 <prefix name="micro-" value="1e-6">
 <alias>u-</alias>
+<alias>µ-</alias>
 </prefix>
 <prefix name="milli-" value="1e-3">
 <alias>m-</alias>

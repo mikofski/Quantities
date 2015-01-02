@@ -3,6 +3,7 @@ classdef unit < double
         name = 'dimensionless'
         dimensionality = '' % dimensionality
         value = 1 % SI equivalent value
+        offset = 0 % offset from reference value
         aliases = {}
         bases = {}
         degrees = 0

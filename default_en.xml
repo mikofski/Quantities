@@ -7,6 +7,9 @@
 
 <ureg>
 
+  <!-- prefixes -->
+  &prefixes;
+
   <!-- reference -->
   <unit name="meter" dimensionality="length">
     <alias>m</alias>
@@ -43,8 +46,39 @@
   <!-- constants -->
   &constants;
 
-  <!-- prefixes -->
-  &prefixes;
+  <dimension name="acceleration" value="length/time^2"/>
+
+  <!-- Angle -->
+  <unit name="turn" value="2*pi*radian">
+    <alias>revolution</alias>
+    <alias>cycle</alias>
+    <alias>circle</alias>
+  </unit>
+  <unit name="degree" value="pi/180*radian">
+    <alias>deg</alias>
+    <alias>arcdeg</alias>
+    <alias>arcdegree</alias>
+    <alias>angular_degree</alias>
+  </unit>
+  <unit name="arcminute" value="arcdeg/60">
+    <alias>arcmin</alias>
+    <alias>arc_minute</alias>
+    <alias>angular_minute</alias>
+  </unit>
+  <unit name="arcsecond" value="arcmin/60">
+    <alias>arcsec</alias>
+    <alias>arc_second</alias>
+    <alias>angular_second</alias>
+  </unit>
+  <unit name="steradian" value="radian^2">
+    <alias>sr</alias>
+  </unit>
+
+  <!-- Area -->
+  <dimension name="area" value="length^2"/>
+  <unit name="are" value="100*m^2"/>
+
+  </unit>
 
   <!-- Length -->
   <unit name="angstrom" value="1e-10 * meter"/>

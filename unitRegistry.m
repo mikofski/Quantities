@@ -1,5 +1,5 @@
 classdef unitRegistry < containers.Map
-    properties
+    properties (SetAccess=private)
         unitsfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
         prefixes = {} % cell string of prefixes keys
         units = {} % cell string of units keys
@@ -23,9 +23,10 @@ classdef unitRegistry < containers.Map
             xdoc = xmlread(ureg.unitsfile);
             xroot = xdoc.getDocumentElement;
             xunits = xroot.getElementsByTagName('unit');
-            for i = 0:xunits.getLength-1
-                xunit = xunits.item(i);
+            for idx = 0:xunits.getLength-1
+                xunit = xunits.item(idx);
                 name = char(xunit.getAttribute('name'));
+                ureg.units{idx+1} = name; % add name to units cellstring
                 dimensionality = xunit.getAttribute('dimensionality');
                 if dimensionality.isEmpty
                     dimensionality = '';
@@ -64,6 +65,12 @@ classdef unitRegistry < containers.Map
                 unit = Quantities.unit(name,dimensionality,value,aliases);
                 subsasgn(ureg,substruct('()',{name}),unit);
             end
+            xprefixes = xroot.getElementsByTagName('prefix');
+            for idx = 0:xprefixes.getLength-1
+                xprefix = xprefixes.item(idx);
+                name = char(xprefix.getAttribute('name'));
+                ureg.prefixes{idx+1} = name;
+            end
         end
         function F = subsref(ureg,s)
             switch s(1).type
@@ -90,24 +97,30 @@ classdef unitRegistry < containers.Map
                     F = subsref@containers.Map(ureg,s);
             end
         end
-        function reg_parser(ureg,xroot,tagname,attrs)
-        % REG_PARSER Parser for registry files
-        %
-        % :param xroot: root node of xml file
-        % :param tagname: tag name to parse
-        % :param attrs: structure of attributes and defaults
-        
-        xnodes = xroot.getElementsByTagName(tagname);
-            for i = 0:xnodes.getLength-1
-                xnode = xnodes.item(i);
-                for attr = attrs
-                    retv = xnode.getAttribute(attr.name);
-                    if retv.isEmpty
-                        retv = attr.default
-                    else
-                        retv = attr.hook
-                    end
+    end
+    methods (Static)
+        function retv = reg_parser(xnode,attrs,taglist)
+            % REG_PARSER Parser for registry files
+            %
+            % :param xnode: node in xml file
+            % :param attrs: structure of attributes and defaults
+            % :param taglist: name of tag used to list text
+            
+            num_attr = numel(attrs);
+            retv = cell(1,num_attr);
+            for idx = 1:num_attr
+                retv{idx} = xnode.getAttribute(attr(idx).name);
+                if retv{idx}.isEmpty
+                    retv{idx} = attr(idx).default;
+                else
+                    retv{idx} = attr(idx).hook(retv);
                 end
+            end
+            xlist = xnode.getElementsByTagName(taglist);
+            nlist = xlist.getLength;
+            retv{idx+1} = cell(1,nlist);
+            for jdx = 0:nlist-1
+                retv{idx+1}{jdx+1} = char(xlist.item(jdx).getTextContent);
             end
         end
     end
