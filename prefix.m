@@ -1,5 +1,5 @@
 classdef prefix
-    properties
+    properties (SetAccess = immutable)
         name
         value
         alias

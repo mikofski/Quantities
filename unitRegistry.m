@@ -13,10 +13,11 @@ classdef unitRegistry < containers.Map
             L = Quantities.dimension('length');
             T = Quantities.dimension('time');
             M = Quantities.dimension('mass');
-            meter = Quantities.unit('meter','length',1,{'m','meters'});
-            inch = Quantities.unit('inch','length',0.0254.*meter,{'in','inches'});
-            second = Quantities.unit('second','time',1,{'s','seconds'});
-            kilogram = Quantities.unit('kilogram','mass',1,{'kg','kilograms'});
+            A = Quantities.dimension('area',L.^2);
+            meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
+            inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
+            second = Quantities.unit('second',T,1,{'s','seconds'});
+            kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
                 'meter','inch','second','kilogram',},...
                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram});
@@ -28,6 +29,16 @@ classdef unitRegistry < containers.Map
             end
             xdoc = xmlread(ureg.unitsfile);
             xroot = xdoc.getDocumentElement;
+            % prefixes
+            xprefixes = xroot.getElementsByTagName('prefix');
+            for idx = 0:xprefixes.getLength-1
+                xprefix = xprefixes.item(idx);
+                name = char(xprefix.getAttribute('name'));
+                ureg.prefixes{idx+1} = name;
+            end
+            % dimensions
+            xdims = xroot.getElementsByTagName('dimension');
+            % units
             xunits = xroot.getElementsByTagName('unit');
             for idx = 0:xunits.getLength-1
                 xunit = xunits.item(idx);
@@ -71,12 +82,6 @@ classdef unitRegistry < containers.Map
                 unit = Quantities.unit(name,dimensionality,value,aliases);
                 subsasgn(ureg,substruct('()',{name}),unit);
             end
-            xprefixes = xroot.getElementsByTagName('prefix');
-            for idx = 0:xprefixes.getLength-1
-                xprefix = xprefixes.item(idx);
-                name = char(xprefix.getAttribute('name'));
-                ureg.prefixes{idx+1} = name;
-            end
         end
         function F = subsref(ureg,s)
             switch s(1).type
@@ -105,7 +110,7 @@ classdef unitRegistry < containers.Map
         end
     end
     methods (Static)
-        function retv = reg_parser(xnode,attrs,taglist)
+        function retv = reg_parser(xnode,attrs)
             % REG_PARSER Parser for registry files
             %
             % :param xnode: node in xml file
@@ -122,11 +127,14 @@ classdef unitRegistry < containers.Map
                     retv{idx} = attr(idx).hook(retv);
                 end
             end
-            xlist = xnode.getElementsByTagName(taglist);
+        end
+        function list = get_tag_text_list(xnode,tag)
+            % GET_TAG_TEXT_LIST Get list of text content from tags.
+            xlist = xnode.getElementsByTagName(tag);
             nlist = xlist.getLength;
-            retv{idx+1} = cell(1,nlist);
-            for jdx = 0:nlist-1
-                retv{idx+1}{jdx+1} = char(xlist.item(jdx).getTextContent);
+            list = cell(1,nlist);
+            for idx = 0:nlist-1
+                list{idx+1} = char(xlist.item(idx).getTextContent);
             end
         end
     end

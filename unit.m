@@ -14,28 +14,40 @@ classdef unit < double
     end
     methods
         function u = unit(name,dimensionality,value,aliases)
+            % default value for no-arg constructor
             if nargin<1
                 value = 1;
             end
+            % value must be either numeric or a quantity class
+            validateattributes(value,{'Quantities.quantity','numeric'},...
+                {'scalar'},'unit','value',3)
             u = u@double(value); % required for subclass of double
+            % parse arguments
             if nargin>0
+                % name must be a string
                 validateattributes(name,{'char'},{'row'},'unit','name',1)
                 u.name = name;
+                % dimensionality must be null or dimensionality class
                 if ~isempty(dimensionality)
-                    validateattributes(dimensionality,{'char'},{'row'},'unit',...
+                    validateattributes(dimensionality,...
+                        {'Quantities.dimension'},{'scalar'},'unit',...
                         'dimensionality',2)
                     u.dimensionality = dimensionality;
+                    u.dimensions = u.dimensionality.dimensions;
+                    % TODO: redundant, refactor to use
+                    % u.dimensionality.dimensions everywhere!
                 end
-                validateattributes(value,{'Quantities.quantity','numeric'},...
-                    {'scalar'},'unit','value',3)
+                % value must equal 1 if not a quantity class
                 if ~isa(value,'Quantities.quantity')
                     assert(value==1,'unit:value',...
                         'Value must be a quantity or set to 1 for base units.')
                 end
                 u.value = value;
+                % get base units and their degrees
+                % TODO: these should be unit class objects
                 [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
-                [u.dimensions,~] = Quantities.unit.parse_name(u.dimensionality);
             end
+            % parse aliases
             if nargin>3 && ~isempty(aliases)
                 validateattributes(aliases,{'cell'},{'vector'},...
                     'unit','aliases',4)
@@ -44,7 +56,7 @@ classdef unit < double
             end
         end
         function disp(u)
-            F = sprintf('\t%s [%s] =\n',u.name,u.dimensionality);
+            F = sprintf('\t%s [%s] =\n',u.name,char(u.dimensionality));
             if isa(u.value,'Quantities.quantity')
                 H = sprintf('%s',char(u.value));
             else
@@ -183,16 +195,20 @@ classdef unit < double
                 else
                     uname = ['(',u.name,')*(',v.name,')'];
                     if u.value==1 && v.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')*(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,...
+                            u.dimensionality.*v.dimensionality,...
                             1);
                     elseif v.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')*(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,...
+                            u.dimensionality.*v.dimensionality,...
                             u.value.*v);
                     elseif u.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')*(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,...
+                            u.dimensionality.*v.dimensionality,...
                             u.*v.value);
                     else
-                        F = Quantities.unit(uname,['(',u.dimensionality,')*(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,...
+                            u.dimensionality.*v.dimensionality,...
                             u.value.*v.value);
                     end
                     F = F.combine; % combine units
@@ -216,17 +232,17 @@ classdef unit < double
                 for b = v.bases
                     idx = idx+1;
                     degree = -v.degrees(idx);
-                    udim = v.dimensions{idx};
+%                     udim = v.dimensions{idx};
                     if degree==1
                         uname = b{1};
-                        udimensionality = udim;
+%                         udimensionality = udim;
                     else
                         uname = [b{1},'^',num2str(degree)];
-                        udimensionality = [udim,'^',num2str(degree)];
+%                         udimensionality = [udim,'^',num2str(degree)];
                     end
-                    F = F.*Quantities.unit(uname,udimensionality,1);
+                    F = F.*Quantities.unit(uname,'',1);
                 end
-                F = Quantities.unit(F.name,F.dimensionality,1./v.value);
+                F = Quantities.unit(F.name,1./v.dimensionality,1./v.value);
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
                 if u.is_dimensionless && ~v.is_dimensionless
                     F = 1./v;
@@ -237,16 +253,16 @@ classdef unit < double
                 else
                     uname = ['(',u.name,')/(',v.name,')'];
                     if u.value==1 && v.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')/(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,u.dimensionality./v.dimensionality,...
                             1);
                     elseif v.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')/(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,u.dimensionality./v.dimensionality,...
                             u.value./v);
                     elseif u.value==1
-                        F = Quantities.unit(uname,['(',u.dimensionality,')/(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,u.dimensionality./v.dimensionality,...
                             u./v.value);
                     else
-                        F = Quantities.unit(uname,['(',u.dimensionality,')/(',v.dimensionality,')'],...
+                        F = Quantities.unit(uname,u.dimensionality./v.dimensionality,...
                             u.value./v.value);
                     end
                     F = F.combine; % combine units
@@ -270,35 +286,45 @@ classdef unit < double
         end
         function F = power(u,n)
             F = 1;
-            for m = 1:n
-                F = F.*u;
+            if n==0
+                return
             end
+            for m = 1:abs(n)
+                if n>0
+                    F = F.*u;
+                else
+                    F = F./u;
+                end
+            end
+        end
+        function F = mpower(u,n)
+            F = u.^n;
         end
         function F = combine(u)
             % COMBINE Combine units.
             unique_bases = unique(u.bases);
             uname = cell(1,numel(unique_bases));
-            udimensionality = cell(size(uname));
+%             udimensionality = cell(size(uname));
             jdx = 0;
             for b = unique_bases
                 jdx = jdx+1;
                 idx = strcmp(b,u.bases);
                 degree = sum(u.degrees(idx));
-                udim = u.dimensions{idx};
+%                 udim = u.dimensions{idx};
                 if degree==0
                     continue
                 elseif degree==1
                     uname(jdx) = b;
-                    udimensionality{jdx} = udim;
+%                     udimensionality{jdx} = udim;
                 else
                     uname{jdx} = [b{1},'^',num2str(degree)];
-                    udimensionality{jdx} = [udim,'^',num2str(degree)];
+%                     udimensionality{jdx} = [udim,'^',num2str(degree)];
                 end
             end
             if iscellstr(uname)
                 uname = strjoin(uname,'*');
-                udimensionality = strjoin(udimensionality,'*');
-                F = Quantities.unit(uname,udimensionality,u.value,u.aliases);
+%                 udimensionality = strjoin(udimensionality,'*');
+                F = Quantities.unit(uname,u.dimensionality,u.value,u.aliases);
             else
                 F = Quantities.unit.DIMENSIONLESS;
             end
@@ -335,8 +361,8 @@ classdef unit < double
             end
             [uname,subexps] = Quantities.unit.parse_parentheses(uname,subexps);
         end
-        function [bases,degrees] = parse_dimensions(uname)
-            % find dimensionality
+        function [bases,degrees] = parse_bases(uname)
+            % find bases
             [matches,splits] = regexp(uname,'[*/]*','match','split');
             if isempty(splits{1})
                 bases = {};
@@ -346,7 +372,7 @@ classdef unit < double
             sz = size(splits);
             bases = cell(sz);
             degrees = ones(sz);
-            tks = regexp(splits{1},'(\w+)\^((?<=\^)[.+\-\d]+)','tokens');
+            tks = regexp(splits{1},'(@?\w+)\^((?<=\^)[.+\-\d]+)','tokens');
             if ~isempty(tks)
                 bases(1) = tks{1}(1);
                 degrees(1) = str2double(tks{1}{2});
@@ -360,7 +386,7 @@ classdef unit < double
                     case '/'
                         numerator_denominator = -1;
                 end
-                tks = regexp(splits{n+1},'(\w+)\^((?<=\^)[.+\-\d]+)','tokens');
+                tks = regexp(splits{n+1},'(@?\w+)\^((?<=\^)[.+\-\d]+)','tokens');
                 if ~isempty(tks)
                     bases(n+1) = tks{1}(1);
                     degrees(n+1) = str2double(tks{1}{2})*numerator_denominator;
@@ -373,11 +399,11 @@ classdef unit < double
         function [bases,degrees] = parse_name(uname)
             % parse units into base units and their degrees
             [uname,subexps] = Quantities.unit.parse_parentheses(uname);
-            [bases,degrees] = Quantities.unit.parse_dimensions(uname);
+            [bases,degrees] = Quantities.unit.parse_bases(uname);
             next = cell(1,2);
             for n = 1:numel(subexps)
                 if all(cellfun(@isempty,next))
-                    [subbases,subdegrees] = Quantities.unit.parse_dimensions(subexps{n});
+                    [subbases,subdegrees] = Quantities.unit.parse_bases(subexps{n});
                 else
                     [subbases,subdegrees] = next{:};
                 end
@@ -389,7 +415,7 @@ classdef unit < double
                     bases = [bases,subbases];
                     degrees = [degrees,subdegrees*degree];
                 else
-                    [next{:}] = Quantities.unit.parse_dimensions(subexps{n+1});
+                    [next{:}] = Quantities.unit.parse_bases(subexps{n+1});
                     idx = strcmp(['@',num2str(n)],next{1});
                     next{1}(idx) = [];
                     degree = next{2}(idx);
