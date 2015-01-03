@@ -313,6 +313,10 @@ classdef unit < double
             end
         end
     end
+    % TODO: maybe theses should be in unitRegistry?
+    % TODO: ``srtrim()`` all bases and dimensions!
+    % TODO: ``sort()`` all bases and dimensions!
+    % TOOD: apply ``unit()`` to bases and ``dimensionality()`` to dimmensions?
     methods (Static)
         function [uname,subexps] = parse_parentheses(uname,subexps)
             % find parenthetic subexpressions

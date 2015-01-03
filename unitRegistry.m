@@ -10,6 +10,9 @@ classdef unitRegistry < containers.Map
     end
     methods
         function ureg = unitRegistry(unitsfile)
+            L = Quantities.dimension('length');
+            T = Quantities.dimension('time');
+            M = Quantities.dimension('mass');
             meter = Quantities.unit('meter','length',1,{'m','meters'});
             inch = Quantities.unit('inch','length',0.0254.*meter,{'in','inches'});
             second = Quantities.unit('second','time',1,{'s','seconds'});
@@ -19,6 +22,9 @@ classdef unitRegistry < containers.Map
                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram});
             if nargin>1
                 ureg.unitsfile = unitsfile;
+            end
+            if exist(ureg.unitsfile,'file')==0
+                return
             end
             xdoc = xmlread(ureg.unitsfile);
             xroot = xdoc.getDocumentElement;
