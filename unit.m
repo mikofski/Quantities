@@ -1,7 +1,7 @@
 classdef unit < double
     properties (SetAccess = immutable)
         name = 'dimensionless'
-        dimensionality = '' % dimensionality
+        dimensionality = [] % dimensionality
         value = 1 % SI equivalent value
         offset = 0 % offset from reference value
         aliases = {}
@@ -232,15 +232,12 @@ classdef unit < double
                 for b = v.bases
                     idx = idx+1;
                     degree = -v.degrees(idx);
-%                     udim = v.dimensions{idx};
                     if degree==1
                         uname = b{1};
-%                         udimensionality = udim;
                     else
                         uname = [b{1},'^',num2str(degree)];
-%                         udimensionality = [udim,'^',num2str(degree)];
                     end
-                    F = F.*Quantities.unit(uname,'',1);
+                    F = F.*Quantities.unit(uname,[],1);
                 end
                 F = Quantities.unit(F.name,1./v.dimensionality,1./v.value);
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
@@ -304,26 +301,21 @@ classdef unit < double
             % COMBINE Combine units.
             unique_bases = unique(u.bases);
             uname = cell(1,numel(unique_bases));
-%             udimensionality = cell(size(uname));
             jdx = 0;
             for b = unique_bases
                 jdx = jdx+1;
                 idx = strcmp(b,u.bases);
                 degree = sum(u.degrees(idx));
-%                 udim = u.dimensions{idx};
                 if degree==0
                     continue
                 elseif degree==1
                     uname(jdx) = b;
-%                     udimensionality{jdx} = udim;
                 else
                     uname{jdx} = [b{1},'^',num2str(degree)];
-%                     udimensionality{jdx} = [udim,'^',num2str(degree)];
                 end
             end
             if iscellstr(uname)
                 uname = strjoin(uname,'*');
-%                 udimensionality = strjoin(udimensionality,'*');
                 F = Quantities.unit(uname,u.dimensionality,u.value,u.aliases);
             else
                 F = Quantities.unit.DIMENSIONLESS;

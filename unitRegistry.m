@@ -46,9 +46,9 @@ classdef unitRegistry < containers.Map
                 ureg.units{idx+1} = name; % add name to units cellstring
                 dimensionality = xunit.getAttribute('dimensionality');
                 if dimensionality.isEmpty
-                    dimensionality = '';
+                    dimensionality = [];
                 else
-                    dimensionality = char(dimensionality);
+                    dimensionality = Quantities.dimension(dimensionality);
                 end
                 xaliases = xunit.getElementsByTagName('alias');
                 num_aliases = xaliases.getLength;
