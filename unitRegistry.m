@@ -100,23 +100,15 @@ classdef unitRegistry < containers.Map
         function F = subsref(ureg,s)
             switch s(1).type
                 case '()'
-                    % search prefixes
-                    s_prefix = substruct('.','prefixes');
-                    for p = subsref@containers.Map(ureg,s_prefix);
-                        regprefix = subsref@containers.Map(ureg,...
-                            substruct('()',p(1)));
-                        if any(strncmp(s(1).subs,regprefix,numel(regprefix)));
-                            %do something
-                        elseif any(strncmp(s(1).subs,regprefix.alias,1));
-                            %do something
-                        end
-                    end
+                    % if key not found, search for aliases and prefixes
                     try
-                        F = subsref@containers.Map(ureg,s);
+                        F = subsref@containers.Map(ureg,s); % base class subsref
                     catch ME
+                        % only catch MATLAB:Containers:Map:NoKey exception
                         if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                             rethrow(ME)
                         end
+                        % search aliases
                         % loop through units and compare s.subs to aliases
                         s_unit = substruct('.','units');
                         for u = subsref@containers.Map(ureg,s_unit);
@@ -126,6 +118,18 @@ classdef unitRegistry < containers.Map
                                 s(1).subs = u(1);
                                 F = subsref@containers.Map(ureg,s);
                                 break
+                            end
+                        end
+                        % search prefixes
+                        s_prefix = substruct('.','prefixes');
+                        for p = subsref@containers.Map(ureg,s_prefix);
+                            regprefix = subsref@containers.Map(ureg,...
+                                substruct('()',p(1)));
+                            if any(strncmp(s(1).subs,regprefix,numel(regprefix)));
+                                % do something
+                            elseif any(strncmp(s(1).subs,regprefix.aliases,...
+                                    numel(regprefix.aliases)));
+                                % do something
                             end
                         end
                     end

@@ -47,7 +47,8 @@ classdef unit < double
             if nargin>3 && ~isempty(aliases)
                 validateattributes(aliases,{'cell'},{'vector'},...
                     'unit','aliases',4)
-                assert(iscellstr(aliases),'unit:aliases','Aliases must be a cell string.')
+                assert(iscellstr(aliases),'unit:aliases',...
+                    'Aliases must be a cell string.')
                 u.aliases = aliases;
             end
         end
