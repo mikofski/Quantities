@@ -1,9 +1,10 @@
 classdef unitRegistry < containers.Map
     properties (SetAccess=private)
         unitsfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
-        prefixes = {} % cell string of prefixes keys
-        units = {} % cell string of units keys
-        constants = {} % cell string of constants keys
+        prefixes = {} % cell string of prefix keys
+        dimensions = {} % cell string of dimension keys
+        units = {} % cell string of unit keys
+        constants = {} % cell string of constant keys
     end
     properties (Constant)
         DEFAULT = Quantities.unitRegistry
@@ -47,13 +48,13 @@ classdef unitRegistry < containers.Map
                 retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
                 dim = Quantities.dimension(retv{:});
                 subsasgn(ureg,substruct('()',{dim.name}),dim);
+                ureg.dimensions{idx+1} = dim.name;
             end
             % units
             xunits = xroot.getElementsByTagName('unit');
             for idx = 0:xunits.getLength-1
                 xunit = xunits.item(idx);
                 name = char(xunit.getAttribute('name'));
-                ureg.units{idx+1} = name; % add name to units cellstring
                 dimensionality = xunit.getAttribute('dimensionality');
                 if dimensionality.isEmpty
                     dimensionality = [];
@@ -93,24 +94,36 @@ classdef unitRegistry < containers.Map
                 end
                 unit = Quantities.unit(name,dimensionality,value,aliases);
                 subsasgn(ureg,substruct('()',{name}),unit);
+                ureg.units{idx+1} = name; % add name to units cellstring
             end
         end
         function F = subsref(ureg,s)
             switch s(1).type
                 case '()'
+                    % search prefixes
+                    s_prefix = substruct('.','prefixes');
+                    for p = subsref@containers.Map(ureg,s_prefix);
+                        regprefix = subsref@containers.Map(ureg,...
+                            substruct('()',p(1)));
+                        if any(strncmp(s(1).subs,regprefix,numel(regprefix)));
+                            %do something
+                        elseif any(strncmp(s(1).subs,regprefix.alias,1));
+                            %do something
+                        end
+                    end
                     try
                         F = subsref@containers.Map(ureg,s);
                     catch ME
                         if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                             rethrow(ME)
                         end
-                        % loop through keys and compare s.subs to aliases
-                        s_key = substruct('.','keys');
-                        for k = subsref@containers.Map(ureg,s_key);
+                        % loop through units and compare s.subs to aliases
+                        s_unit = substruct('.','units');
+                        for u = subsref@containers.Map(ureg,s_unit);
                             aliases = subsref@containers.Map(ureg,...
-                                substruct('()',k(1),'.',{'aliases'}));
+                                substruct('()',u(1),'.',{'aliases'}));
                             if any(strcmp(s(1).subs,aliases))
-                                s(1).subs = k(1);
+                                s(1).subs = u(1);
                                 F = subsref@containers.Map(ureg,s);
                                 break
                             end
