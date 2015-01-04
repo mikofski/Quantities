@@ -11,28 +11,35 @@
   &prefixes;
 
   <!-- reference -->
+  <dimension name="length"/>
   <unit name="meter" dimensionality="length">
     <alias>m</alias>
     <alias>metre</alias>
   </unit>
+  <dimension name="time"/>
   <unit name="second" dimensionality="time">
     <alias>s</alias>
     <alias>sec</alias>
   </unit>
+  <dimension name="current"/>
   <unit name="ampere" dimensionality="current">
     <alias>A</alias>
     <alias>amp</alias>
   </unit>
+  <dimension name="luminosity"/>
   <unit name="candela" dimensionality="luminosity">
     <alias>cd</alias>
     <alias>candle</alias>
   </unit>
+  <dimension name="mass"/>
   <unit name="gram" dimensionality="mass">
     <alias>g</alias>
   </unit>
+  <dimension name="substance"/>
   <unit name="mole" dimensionality="substance">
     <alias>mol</alias>
   </unit>
+  <dimension name="temperature"/>
   <unit name="kelvin" dimensionality="temperature">
     <alias>K</alias>
     <alias>degK</alias>
@@ -76,8 +83,12 @@
 
   <!-- Area -->
   <dimension name="area" value="length^2"/>
-  <unit name="are" value="100*m^2"/>
-
+  <unit name="are" value="100*m^2" dimension="area"/>
+  <unit name="barn" value="1e-28*m" dimension="area">
+    <alias>b</alias>
+  </unit>
+  <unit name="cmil" value="5.067075e-10*m^2" dimension="area">
+    <alias>circular_mils</alias>
   </unit>
 
   <!-- Length -->

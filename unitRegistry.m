@@ -10,18 +10,20 @@ classdef unitRegistry < containers.Map
     end
     methods
         function ureg = unitRegistry(unitsfile)
-            L = Quantities.dimension('length');
-            T = Quantities.dimension('time');
-            M = Quantities.dimension('mass');
-            A = Quantities.dimension('area',L.^2);
-            meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
-            inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
-            second = Quantities.unit('second',T,1,{'s','seconds'});
-            kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
-            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
-                'meter','inch','second','kilogram',},...
-                {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram});
-            if nargin>1
+%             L = Quantities.dimension('length');
+%             T = Quantities.dimension('time');
+%             M = Quantities.dimension('mass');
+%             A = Quantities.dimension('area',L.^2);
+%             meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
+%             inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
+%             second = Quantities.unit('second',T,1,{'s','seconds'});
+%             kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
+%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
+%                 'meter','inch','second','kilogram',},...
+%                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram});
+            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
+                {Quantities.unit.DIMENSIONLESS});
+            if nargin>0
                 ureg.unitsfile = unitsfile;
             end
             if exist(ureg.unitsfile,'file')==0
@@ -38,6 +40,14 @@ classdef unitRegistry < containers.Map
             end
             % dimensions
             xdims = xroot.getElementsByTagName('dimension');
+            attrs = struct('name',{'name','value'},'default',{'derived',1},...
+                'hook',{@char,@ureg.get_value});
+            for idx = 0:xdims.getLength-1
+                xdim = xdims.item(idx);
+                retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
+                dim = Quantities.dimension(retv{:});
+                subsasgn(ureg,substruct('()',{dim.name}),dim);
+            end
             % units
             xunits = xroot.getElementsByTagName('unit');
             for idx = 0:xunits.getLength-1
@@ -47,8 +57,10 @@ classdef unitRegistry < containers.Map
                 dimensionality = xunit.getAttribute('dimensionality');
                 if dimensionality.isEmpty
                     dimensionality = [];
+                elseif ureg.isKey(char(dimensionality))
+                    dimensionality = subsref(ureg,substruct('()',char(dimensionality)));
                 else
-                    dimensionality = Quantities.dimension(dimensionality);
+                    dimensionality = Quantities.dimension(char(dimensionality));
                 end
                 xaliases = xunit.getElementsByTagName('alias');
                 num_aliases = xaliases.getLength;
@@ -69,7 +81,7 @@ classdef unitRegistry < containers.Map
                             try
                                 val = subsref(ureg,substruct('()',val));
                             catch ME
-                                if strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
+                                if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                                     rethrow(ME)
                                 end
                                 error('unitRegistry:value',...
@@ -108,6 +120,26 @@ classdef unitRegistry < containers.Map
                     F = subsref@containers.Map(ureg,s);
             end
         end
+        function value = get_value(ureg,value)
+            [v,d] = Quantities.unit.parse_name(char(value));
+            value = 1;
+            for idx = 1:numel(v)
+                val = str2double(v{idx});
+                if isnan(val)
+                    val = strtrim(v{idx});
+                    try
+                        val = subsref(ureg,substruct('()',val));
+                    catch ME
+                        if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
+                            rethrow(ME)
+                        end
+                        error('unitRegistry:value',...
+                            'Value refers to key that could not be found.')
+                    end
+                end
+                value = value.*val.^d(idx);
+            end
+        end
     end
     methods (Static)
         function retv = reg_parser(xnode,attrs)
@@ -120,11 +152,11 @@ classdef unitRegistry < containers.Map
             num_attr = numel(attrs);
             retv = cell(1,num_attr);
             for idx = 1:num_attr
-                retv{idx} = xnode.getAttribute(attr(idx).name);
+                retv{idx} = xnode.getAttribute(attrs(idx).name);
                 if retv{idx}.isEmpty
-                    retv{idx} = attr(idx).default;
+                    retv{idx} = attrs(idx).default;
                 else
-                    retv{idx} = attr(idx).hook(retv);
+                    retv{idx} = attrs(idx).hook(retv{idx});
                 end
             end
         end

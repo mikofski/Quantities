@@ -7,7 +7,6 @@ classdef unit < double
         aliases = {}
         bases = {}
         degrees = 0
-        dimensions = {}
     end
     properties (Constant)
         DIMENSIONLESS = Quantities.unit;
@@ -33,9 +32,6 @@ classdef unit < double
                         {'Quantities.dimension'},{'scalar'},'unit',...
                         'dimensionality',2)
                     u.dimensionality = dimensionality;
-                    u.dimensions = u.dimensionality.dimensions;
-                    % TODO: redundant, refactor to use
-                    % u.dimensionality.dimensions everywhere!
                 end
                 % value must equal 1 if not a quantity class
                 if ~isa(value,'Quantities.quantity')
@@ -300,13 +296,15 @@ classdef unit < double
         function F = combine(u)
             % COMBINE Combine units.
             unique_bases = unique(u.bases);
-            uname = cell(1,numel(unique_bases));
+            uname = cell(size(unique_bases));
             jdx = 0;
             for b = unique_bases
                 jdx = jdx+1;
                 idx = strcmp(b,u.bases);
                 degree = sum(u.degrees(idx));
                 if degree==0
+                    uname(jdx) = []; % pop unused cell
+                    jdx = jdx-1; % adjust index
                     continue
                 elseif degree==1
                     uname(jdx) = b;
@@ -332,9 +330,8 @@ classdef unit < double
         end
     end
     % TODO: maybe theses should be in unitRegistry?
-    % TODO: ``srtrim()`` all bases and dimensions!
-    % TODO: ``sort()`` all bases and dimensions!
-    % TOOD: apply ``unit()`` to bases and ``dimensionality()`` to dimmensions?
+    % TODO: ``srtrim()`` and ``sort()`` all bases!
+    % TODO: or do this at entry point for unit
     methods (Static)
         function [uname,subexps] = parse_parentheses(uname,subexps)
             % find parenthetic subexpressions

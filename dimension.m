@@ -137,13 +137,15 @@ classdef dimension < double
         function F = combine(dim)
             % COMBINE Combine dimensions.
             unique_dims = unique(dim.dimensions);
-            dim_name = cell(1,numel(unique_dims));
+            dim_name = cell(size(unique_dims));
             jdx = 0;
             for d = unique_dims
                 jdx = jdx+1;
                 idx = strcmp(d,dim.dimensions);
                 degree = sum(dim.degrees(idx));
                 if degree==0
+                    dim_name(jdx) = []; % pop unused cell
+                    jdx = jdx-1; % adjust index
                     continue
                 elseif degree==1
                     dim_name(jdx) = d;
