@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE doc [
-<!ENTITY constants SYSTEM "constants_en.xml">
 <!ENTITY prefixes SYSTEM "prefixes_en.xml">
+<!ENTITY dimensions SYSTEM "dimensions_en.xml">
+<!ENTITY constants SYSTEM "constants_en.xml">
 ]>
 
 <ureg>
@@ -10,36 +11,35 @@
   <!-- prefixes -->
   &prefixes;
 
+  <!-- dimensions -->
+  &dimensions;
+
+  <!-- constants -->
+  &constants;
+
   <!-- reference -->
-  <dimension name="length"/>
   <unit name="meter" dimensionality="length">
     <alias>m</alias>
     <alias>metre</alias>
   </unit>
-  <dimension name="time"/>
   <unit name="second" dimensionality="time">
     <alias>s</alias>
     <alias>sec</alias>
   </unit>
-  <dimension name="current"/>
   <unit name="ampere" dimensionality="current">
     <alias>A</alias>
     <alias>amp</alias>
   </unit>
-  <dimension name="luminosity"/>
   <unit name="candela" dimensionality="luminosity">
     <alias>cd</alias>
     <alias>candle</alias>
   </unit>
-  <dimension name="mass"/>
   <unit name="gram" dimensionality="mass">
     <alias>g</alias>
   </unit>
-  <dimension name="substance"/>
   <unit name="mole" dimensionality="substance">
     <alias>mol</alias>
   </unit>
-  <dimension name="temperature"/>
   <unit name="kelvin" dimensionality="temperature">
     <alias>K</alias>
     <alias>degK</alias>
@@ -49,11 +49,6 @@
   </unit>
   <unit name="bit"/>
   <unit name="count"/>
-
-  <!-- constants -->
-  &constants;
-
-  <dimension name="acceleration" value="length/time^2"/>
 
   <!-- Angle -->
   <unit name="turn" value="2*pi*radian">
@@ -82,7 +77,6 @@
   </unit>
 
   <!-- Area -->
-  <dimension name="area" value="length^2"/>
   <unit name="are" value="100*m^2" dimensionality="area"/>
   <unit name="barn" value="1e-28*m" dimensionality="area">
     <alias>b</alias>

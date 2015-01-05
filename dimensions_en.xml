@@ -1,0 +1,12 @@
+<!-- reference -->
+<dimension name="length"/>
+<dimension name="time"/>
+<dimension name="current"/>
+<dimension name="luminosity"/>
+<dimension name="mass"/>
+<dimension name="substance"/>
+<dimension name="temperature"/>
+
+<!-- derived -->
+<dimension name="acceleration" value="length/time^2"/>
+<dimension name="area" value="length^2"/>
