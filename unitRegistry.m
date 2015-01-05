@@ -16,21 +16,23 @@ classdef unitRegistry < containers.Map
             M = Quantities.dimension('mass');
             a = Quantities.dimension('acceleration',L./T.^2);
             F = Quantities.dimension('force',M.*a);
+            kilo = Quantities.prefix('kilo',1000,{'k'});
+            deci = Quantities.prefix('deci',0.1,{'d'});
+            deca = Quantities.prefix('deca',1000,{'da'});
             meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
             inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
             second = Quantities.unit('second',T,1,{'s','seconds'});
-            kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
-            Newton = Quantities.unit('Newton',F,kilogram.*meter./second.^2,...
-                {'N','Newtons','newton','newtons'});
-            kilo = Quantities.prefix('kilo',1000,{'k'});
+            gram = Quantities.unit('gram',M,1,{'g','grams'});
+            newton = Quantities.unit('Newton',F,kilo*gram.*meter./second.^2,...
+                {'N','newtons'});
             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
-                'meter','inch','second','kilogram','length','time','mass',...
-                'acceleration','force','Newton','kilo'},...
-                {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram,...
-                L,T,M,a,F,Newton,kilo});
-            ureg.prefixes = {'kilo'};
+                'meter','inch','second','gram','length','time','mass',...
+                'acceleration','force','newton','kilo','deci','deca'},...
+                {Quantities.unit.DIMENSIONLESS,meter,inch,second,gram,...
+                L,T,M,a,F,newton,kilo,deci,deca});
+            ureg.prefixes = {'kilo','deci','deca'};
             ureg.dimensions = {'length','time','mass','acceleration','force'};
-            ureg.units = {'meter','inch','second','kilogram','Newton'};
+            ureg.units = {'meter','inch','second','gram','newton'};
 %             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
 %                 {Quantities.unit.DIMENSIONLESS});
             if nargin>0
@@ -132,22 +134,29 @@ classdef unitRegistry < containers.Map
                         % search prefixes
                         s_prefix = substruct('.','prefixes');
                         for p = subsref@containers.Map(ureg,s_prefix);
+                            u = [];
+                            % check prefix and its aliases
                             prefix = subsref@containers.Map(ureg,...
                                 substruct('()',p(1)));
                             len_prefix = numel(prefix.name);
-                            % check prefix and its aliases
-                            u = [];
+                            % get alias indices checking 1st letter
+                            alias_idx = strncmp(s(1).subs,prefix.aliases,1);
                             if any(strncmp(s(1).subs,prefix.name,len_prefix));
                                 % get unit name
                                 u = s(1).subs{1}(len_prefix+1:end);
-                            elseif any(strncmp(s(1).subs,prefix.aliases,1));
+                            elseif any(alias_idx);
                                 % get alias
-                                alias_idx = strncmp(s(1).subs,prefix.aliases,1);
                                 prefix_alias = prefix.aliases(alias_idx);
+                                assert(isscalar(alias_idx),...
+                                    'unitRegistry:subsref',...
+                                    'Prefix aliases can''t have same first letter.')
+                                prefix_alias = prefix_alias{1};
                                 % get unit name
                                 u = s(1).subs{1}(numel(prefix_alias)+1:end);
                             end
+                            % return if matching unit found without prefix
                             % get unit
+                            % TODO: refactor to eliminate redundancy
                             if ~isempty(u)
                                 try
                                     u = subsref@containers.Map(ureg,substruct('()',u));
@@ -173,8 +182,8 @@ classdef unitRegistry < containers.Map
                                     if numel(s)>1
                                         F = subsref(F,s(2:end));
                                     end
+                                    return
                                 end
-                                return
                             end
                         end
                         throw(ME)

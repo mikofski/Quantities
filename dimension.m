@@ -126,8 +126,8 @@ classdef dimension < double
                 tf = tf && all(dim1.degrees(idx1)==dim2.degrees(idx2));
             elseif ischar(dim2)
                 % TODO: convert all names, bases and dimensions to lower case
-                tf_by_name = strcmpi(dim1.name,dim2);
-                tf_by_dims = strcmpi(dim1,Quantities.dimension('dim2',dim2));
+                tf_by_name = strcmp(dim1.name,dim2);
+                tf_by_dims = strcmp(dim1,Quantities.dimension('dim2',dim2));
                 tf = tf_by_name || tf_by_dims;
             end
         end
