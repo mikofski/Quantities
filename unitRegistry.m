@@ -7,23 +7,32 @@ classdef unitRegistry < containers.Map
         constants = {} % cell string of constant keys
     end
     properties (Constant)
-        DEFAULT = Quantities.unitRegistry
+        DEFAULT = Quantities.unitRegistry('')
     end
     methods
         function ureg = unitRegistry(unitsfile)
-%             L = Quantities.dimension('length');
-%             T = Quantities.dimension('time');
-%             M = Quantities.dimension('mass');
-%             A = Quantities.dimension('area',L.^2);
-%             meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
-%             inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
-%             second = Quantities.unit('second',T,1,{'s','seconds'});
-%             kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
-%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
-%                 'meter','inch','second','kilogram',},...
-%                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram});
-            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
-                {Quantities.unit.DIMENSIONLESS});
+            L = Quantities.dimension('length');
+            T = Quantities.dimension('time');
+            M = Quantities.dimension('mass');
+            a = Quantities.dimension('acceleration',L./T.^2);
+            F = Quantities.dimension('force',M.*a);
+            meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
+            inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
+            second = Quantities.unit('second',T,1,{'s','seconds'});
+            kilogram = Quantities.unit('kilogram',M,1,{'kg','kilograms'});
+            Newton = Quantities.unit('Newton',F,kilogram.*meter./second.^2,...
+                {'N','Newtons','newton','newtons'});
+            kilo = Quantities.prefix('kilo',1000,{'k'});
+            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
+                'meter','inch','second','kilogram','length','time','mass',...
+                'acceleration','force','Newton','kilo'},...
+                {Quantities.unit.DIMENSIONLESS,meter,inch,second,kilogram,...
+                L,T,M,a,F,Newton,kilo});
+            ureg.prefixes = {'kilo'};
+            ureg.dimensions = {'length','time','mass','acceleration','force'};
+            ureg.units = {'meter','inch','second','kilogram','Newton'};
+%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
+%                 {Quantities.unit.DIMENSIONLESS});
             if nargin>0
                 ureg.unitsfile = unitsfile;
             end
@@ -117,21 +126,58 @@ classdef unitRegistry < containers.Map
                             if any(strcmp(s(1).subs,aliases))
                                 s(1).subs = u(1);
                                 F = subsref@containers.Map(ureg,s);
-                                break
+                                return
                             end
                         end
                         % search prefixes
                         s_prefix = substruct('.','prefixes');
                         for p = subsref@containers.Map(ureg,s_prefix);
-                            regprefix = subsref@containers.Map(ureg,...
+                            prefix = subsref@containers.Map(ureg,...
                                 substruct('()',p(1)));
-                            if any(strncmp(s(1).subs,regprefix,numel(regprefix)));
-                                % do something
-                            elseif any(strncmp(s(1).subs,regprefix.aliases,...
-                                    numel(regprefix.aliases)));
-                                % do something
+                            len_prefix = numel(prefix.name);
+                            % check prefix and its aliases
+                            u = [];
+                            if any(strncmp(s(1).subs,prefix.name,len_prefix));
+                                % get unit name
+                                u = s(1).subs{1}(len_prefix+1:end);
+                            elseif any(strncmp(s(1).subs,prefix.aliases,1));
+                                % get alias
+                                alias_idx = strncmp(s(1).subs,prefix.aliases,1);
+                                prefix_alias = prefix.aliases(alias_idx);
+                                % get unit name
+                                u = s(1).subs{1}(numel(prefix_alias)+1:end);
+                            end
+                            % get unit
+                            if ~isempty(u)
+                                try
+                                    u = subsref@containers.Map(ureg,substruct('()',u));
+                                catch ME
+                                    % only catch MATLAB:Containers:Map:NoKey exception
+                                    if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
+                                        rethrow(ME)
+                                    end
+                                    % search aliases
+                                    % loop through units and compare s.subs to aliases
+                                    for reg_unit = subsref@containers.Map(ureg,s_unit);
+                                        aliases = subsref@containers.Map(ureg,...
+                                            substruct('()',reg_unit(1),'.',{'aliases'}));
+                                        if any(strcmp(u,aliases))
+                                            u = subsref@containers.Map(ureg,...
+                                                substruct('()',reg_unit));
+                                            break
+                                        end
+                                    end
+                                end
+                                if isa(u,'Quantities.unit')
+                                    F = prefix.*u;
+                                    if numel(s)>1
+                                        F = subsref(F,s(2:end));
+                                    end
+                                end
+                                return
                             end
                         end
+                        throw(ME)
                     end
                 otherwise
                     F = subsref@containers.Map(ureg,s);

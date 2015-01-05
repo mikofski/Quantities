@@ -12,8 +12,8 @@ classdef dimension < double
                 value = 1;
             end
             % value must be either numeric or a dimension class
-            validateattributes(value,{'Quantities.dimension','numeric'},...
-                {'scalar'},'dimension','value',2)
+            % since 'Quantities.dimension' is double it _is_ numeric
+            validateattributes(value,{'numeric'},{'scalar'},'dimension','value',2)
             dim = dim@double(value); % required for subclass of double
             validateattributes(name,{'char'},{'row'},'dimension','name',1)
             dim.name = name;

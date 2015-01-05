@@ -11,15 +11,13 @@ classdef prefix < double
                 value = 1;
             end
             % value must be either numeric or a dimension class
-            validateattributes(value,{'numeric'},...
-                {'scalar'},'prefix','value',2)
+            validateattributes(value,{'numeric'},{'scalar'},'prefix','value',2)
             pre = pre@double(value); % required for subclass of double
             pre.name = name;
             pre.value = value;
             % aliases
             if nargin>2 && ~isempty(aliases)
-                validateattributes(aliases,{'cell'},{'vector'},...
-                    'unit','aliases',4)
+                validateattributes(aliases,{'cell'},{'vector'},'unit','aliases',4)
                 assert(iscellstr(aliases),'unit:aliases',...
                     'Aliases must be a cell string.')
                 pre.aliases = aliases;

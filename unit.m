@@ -1,15 +1,16 @@
 classdef unit < double
     properties (SetAccess = immutable)
-        name = 'dimensionless'
-        dimensionality = [] % dimensionality
-        value = 1 % SI equivalent value
+        name = 'dimensionless' % unit name
+        dimensionality = [] % dimensionality of unit
+        value = 1 % base system equivalent value, 1 for base units
         offset = 0 % offset from reference value
-        aliases = {}
-        bases = {}
-        degrees = 0
+        aliases = {} % pseudonyms and abbreviations
+        prefix % prefix multiplier, empty if none, only for base units
+        bases = {} % units parsed into base units
+        degrees = 0 % degree of each corresponding base
     end
     properties (Constant)
-        DIMENSIONLESS = Quantities.unit;
+        DIMENSIONLESS = Quantities.unit % dimensionless unit
     end
     methods
         function u = unit(name,dimensionality,value,aliases)
@@ -18,8 +19,8 @@ classdef unit < double
                 value = 1;
             end
             % value must be either numeric or a quantity class
-            validateattributes(value,{'Quantities.quantity','numeric'},...
-                {'scalar'},'unit','value',3)
+            % since 'Quantities.quantity' is double it _is_ numeric!
+            validateattributes(value,{'numeric'},{'scalar'},'unit','value',3)
             u = u@double(value); % required for subclass of double
             % parse arguments
             if nargin>0
@@ -34,6 +35,9 @@ classdef unit < double
                     u.dimensionality = dimensionality;
                 end
                 % value must equal 1 if not a quantity class
+                if isa(value,'Quantities.unit')
+                    value = Quantities.quantity.as_quantity(value);
+                end
                 if ~isa(value,'Quantities.quantity')
                     assert(value==1,'unit:value',...
                         'Value must be a quantity or set to 1 for base units.')
@@ -45,8 +49,7 @@ classdef unit < double
             end
             % parse aliases
             if nargin>3 && ~isempty(aliases)
-                validateattributes(aliases,{'cell'},{'vector'},...
-                    'unit','aliases',4)
+                validateattributes(aliases,{'cell'},{'vector'},'unit','aliases',4)
                 assert(iscellstr(aliases),'unit:aliases',...
                     'Aliases must be a cell string.')
                 u.aliases = aliases;
