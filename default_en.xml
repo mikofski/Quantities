@@ -83,11 +83,11 @@
 
   <!-- Area -->
   <dimension name="area" value="length^2"/>
-  <unit name="are" value="100*m^2" dimension="area"/>
-  <unit name="barn" value="1e-28*m" dimension="area">
+  <unit name="are" value="100*m^2" dimensionality="area"/>
+  <unit name="barn" value="1e-28*m" dimensionality="area">
     <alias>b</alias>
   </unit>
-  <unit name="cmil" value="5.067075e-10*m^2" dimension="area">
+  <unit name="cmil" value="5.067075e-10*m^2" dimensionality="area">
     <alias>circular_mils</alias>
   </unit>
 

@@ -47,15 +47,19 @@ classdef unitRegistry < containers.Map
             xroot = xdoc.getDocumentElement;
             % prefixes
             xprefixes = xroot.getElementsByTagName('prefix');
+            attrs = struct('name',{'name','value'},'default',{'',1},...
+                'hook',{@char,@ureg.get_value});
             for idx = 0:xprefixes.getLength-1
                 xprefix = xprefixes.item(idx);
-                name = char(xprefix.getAttribute('name'));
-                ureg.prefixes{idx+1} = name;
+                retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
+                aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
+                pre = Quantities.prefix(retv{:},aliases);
+                subsasgn(ureg,substruct('()',{pre.name}),pre);
+                ureg.prefixes{idx+1} = pre.name;
             end
             % dimensions
             xdims = xroot.getElementsByTagName('dimension');
-            attrs = struct('name',{'name','value'},'default',{'derived',1},...
-                'hook',{@char,@ureg.get_value});
+            % uses same attributes from prefixes
             for idx = 0:xdims.getLength-1
                 xdim = xdims.item(idx);
                 retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
