@@ -11,6 +11,7 @@ classdef unitRegistry < containers.Map
     end
     methods
         function ureg = unitRegistry(unitsfile)
+            pi_const = Quantities.constant('pi',pi);
             L = Quantities.dimension('length');
             T = Quantities.dimension('time');
             M = Quantities.dimension('mass');
@@ -27,10 +28,11 @@ classdef unitRegistry < containers.Map
                 {'N','newtons'});
             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
                 'meter','inch','second','gram','length','time','mass',...
-                'acceleration','force','newton','kilo','deci','deca'},...
+                'acceleration','force','newton','kilo','deci','deca','pi'},...
                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,gram,...
-                L,T,M,a,F,newton,kilo,deci,deca});
+                L,T,M,a,F,newton,kilo,deci,deca,pi_const});
             ureg.prefixes = {'kilo','deci','deca'};
+            ureg.constants = {'pi'};
             ureg.dimensions = {'length','time','mass','acceleration','force'};
             ureg.units = {'meter','inch','second','gram','newton'};
 %             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
@@ -70,7 +72,7 @@ classdef unitRegistry < containers.Map
                 if dimensionality.isEmpty
                     dimensionality = [];
                 elseif ureg.isKey(char(dimensionality))
-                    dimensionality = subsref(ureg,substruct('()',char(dimensionality)));
+                    dimensionality = subsref(ureg,substruct('()',{char(dimensionality)}));
                 else
                     dimensionality = Quantities.dimension(char(dimensionality));
                 end
@@ -91,7 +93,7 @@ classdef unitRegistry < containers.Map
                         if isnan(val)
                             val = strtrim(v{vi});
                             try
-                                val = subsref(ureg,substruct('()',val));
+                                val = subsref(ureg,substruct('()',{val}));
                             catch ME
                                 if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                                     rethrow(ME)
@@ -124,9 +126,9 @@ classdef unitRegistry < containers.Map
                         s_unit = substruct('.','units');
                         for u = subsref@containers.Map(ureg,s_unit);
                             aliases = subsref@containers.Map(ureg,...
-                                substruct('()',u(1),'.',{'aliases'}));
+                                substruct('()',u,'.','aliases'));
                             if any(strcmp(s(1).subs,aliases))
-                                s(1).subs = u(1);
+                                s(1).subs = u;
                                 F = subsref@containers.Map(ureg,s);
                                 return
                             end
@@ -137,7 +139,7 @@ classdef unitRegistry < containers.Map
                             u = [];
                             % check prefix and its aliases
                             prefix = subsref@containers.Map(ureg,...
-                                substruct('()',p(1)));
+                                substruct('()',p));
                             len_prefix = numel(prefix.name);
                             % get alias indices checking 1st letter
                             alias_idx = strncmp(s(1).subs,prefix.aliases,1);
@@ -159,7 +161,7 @@ classdef unitRegistry < containers.Map
                             % TODO: refactor to eliminate redundancy
                             if ~isempty(u)
                                 try
-                                    u = subsref@containers.Map(ureg,substruct('()',u));
+                                    u = subsref@containers.Map(ureg,substruct('()',{u}));
                                 catch ME
                                     % only catch MATLAB:Containers:Map:NoKey exception
                                     if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
@@ -169,7 +171,7 @@ classdef unitRegistry < containers.Map
                                     % loop through units and compare s.subs to aliases
                                     for reg_unit = subsref@containers.Map(ureg,s_unit);
                                         aliases = subsref@containers.Map(ureg,...
-                                            substruct('()',reg_unit(1),'.',{'aliases'}));
+                                            substruct('()',reg_unit,'.','aliases'));
                                         if any(strcmp(u,aliases))
                                             u = subsref@containers.Map(ureg,...
                                                 substruct('()',reg_unit));

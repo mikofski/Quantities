@@ -204,6 +204,23 @@ classdef quantity < double
                 (y.average.*x.average.^(y.average-1)).^2.*x.variance+...
                 (log(x.average).*x.average.^y.average).^2.*y.variance);
         end
+        function F = mpower(x,y)
+            if isscalar(y)
+                F = 1;
+                if x==0
+                    return
+                end
+                for n = 1:abs(x)
+                    if x>0
+                        F = F*x;
+                    else
+                        F = F/x;
+                    end
+                end
+            else
+                F = mpower@double(x,y);
+            end
+        end
         function F = rdivide(x,y)
             % F = x./y
             % dF^2 = (1./y.*dx).^2+(-x./y.^2.*dy).^2
@@ -214,6 +231,13 @@ classdef quantity < double
                 'variance',1./y.average.^2.*x.variance+...
                 (x.average./y.average.^2).^2.*y.variance); % (-1)^2 = 1
         end
+        function F = mrdivide(x,y)
+            if isscalar(x) && isscalar(y)
+                F = x.\y;
+            else
+                F = mrdivide(x,y);
+            end
+        end
         function F = ldivide(x,y)
             % F = x.\y = y./x
             % dF^2 = (1./x.*dy).^2+(-y./x.^2.*dx).^2
@@ -223,6 +247,13 @@ classdef quantity < double
             F = Quantities.quantity(ldivide@double(x,y),'units',unit,...
                 'variance',1./x.average.^2.*y.variance+...
                 (y.average./x.average.^2).^2.*x.variance); % (-1)^2 = 1
+        end
+        function F = mldivide(x,y)
+            if isscalar(x) && isscalar(y)
+                F = x./y;
+            else
+                F = mldivide(x,y);
+            end
         end
         function F = uplus(x)
             % F = +x
@@ -278,11 +309,11 @@ classdef quantity < double
                 return
             end
             F = x.units.value.*x./x.units;
-            F = F.combine_units;
+%             F = F.combine_units;
         end
-        function F = combine_units(x)
-            F = Quantities.quantity(x.average,x.stdev,x.units.combine);
-        end
+%         function F = combine_units(x)
+%             F = Quantities.quantity(x.average,x.stdev,x.units.combine);
+%         end
     end
     methods (Static)
         function F = as_quantity(x)
