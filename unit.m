@@ -5,7 +5,6 @@ classdef unit < double
         value = 1 % base system equivalent value, 1 for base units
         offset = 0 % offset from reference value
         aliases = {} % pseudonyms and abbreviations
-        prefix % prefix multiplier, empty if none, only for base units
         bases = {} % units parsed into base units
         degrees = 0 % degree of each corresponding base
     end

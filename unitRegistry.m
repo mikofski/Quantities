@@ -11,7 +11,7 @@ classdef unitRegistry < containers.Map
     end
     methods
         function ureg = unitRegistry(unitsfile)
-            pi_const = Quantities.constant('pi',pi);
+            pi_const = Quantities.constant('pi',Quantities.quantity(pi));
             L = Quantities.dimension('length');
             T = Quantities.dimension('time');
             M = Quantities.dimension('mass');
@@ -67,6 +67,17 @@ classdef unitRegistry < containers.Map
                 subsasgn(ureg,substruct('()',{dim.name}),dim);
                 ureg.dimensions{idx+1} = dim.name;
             end
+            % constants
+            xconsts = xroot.getElementsByTagName('constant');
+            % uses same attributes from prefixes
+            for idx = 0:xconsts.getLength-1
+                xconst = xconsts.item(idx);
+                retv = Quantities.unitRegistry.reg_parser(xconst,attrs);
+                aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
+                const = Quantities.constant(retv{:},aliases);
+                subsasgn(ureg,substruct('()',{const.name}),const);
+                ureg.constants{idx+1} = const.name;
+            end
             % units
             xunits = xroot.getElementsByTagName('unit');
             attrs = struct('name',{'name','dimensionality','value'},...
@@ -94,6 +105,7 @@ classdef unitRegistry < containers.Map
                         end
                         % search aliases
                         % loop through units and compare s.subs to aliases
+                        % TODO: search constants for aliases too
                         s_unit = substruct('.','units');
                         for u = subsref@containers.Map(ureg,s_unit);
                             aliases = subsref@containers.Map(ureg,...
