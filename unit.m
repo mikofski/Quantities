@@ -356,9 +356,10 @@ classdef unit < double
         end
         function [bases,degrees] = parse_bases(uname)
             % find bases
-            [matches,splits] = regexp(uname,'(?<!\^\([.+\-\d]+)[*/]?(?![.+\-\d]+\))','match','split');
+            [matches,splits] = regexp(uname,...
+                '(?<!\^\([.+\-\d]+)[*/]?(?![.+\-\d]+\))','match','split');
             assert(~any(cellfun(@isempty,splits)),'unit:parse_bases',...
-                'Repeated multiplication or division, IE: "**, */ or //".')
+                'Repeated multiplication or division, IE: "**, /*, */ or //".')
             if isempty(splits{1})
                 bases = {};
                 degrees = [];
@@ -367,14 +368,16 @@ classdef unit < double
             sz = size(splits);
             bases = cell(sz);
             degrees = ones(sz);
-            % nonmatching look behind is _not_ needed because using groups
+            % look-around patterns _not_ used when only using tokens
             % allow but do not group exponents in parentheses
-            % allow fraction in exponent
-            pattern = '(@?\w+)\^\(?([.+\-\d/]+)\)?';
+            % allow fraction in exponent, but do not allow multiplication
+            pattern = '^(@?\w+)\^\(?([.+\-\d*/]+)\)?$';
             tks = regexp(splits{1},pattern,'tokens');
             if ~isempty(tks)
                 bases(1) = tks{1}(1);
                 fraction = strfind(tks{1}{2},'/');
+                assert(isempty(strfind(tks{1}{2},'*')),'unit:parse_bases',...
+                    'No multiplication allowed in exponent.');
                 if isempty(fraction)
                     degrees(1) = str2double(tks{1}{2});
                 elseif isscalar(fraction)
@@ -401,6 +404,8 @@ classdef unit < double
                 if ~isempty(tks)
                     bases(n+1) = tks{1}(1);
                     fraction = strfind(tks{1}{2},'/');
+                    assert(isempty(strfind(tks{1}{2},'*')),'unit:parse_bases',...
+                        'No multiplication allowed in exponent.');
                     if isempty(fraction)
                         degrees(n+1) = str2double(tks{1}{2})*exponent_sign;
                     elseif isscalar(fraction)
