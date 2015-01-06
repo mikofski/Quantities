@@ -69,49 +69,54 @@ classdef unitRegistry < containers.Map
             end
             % units
             xunits = xroot.getElementsByTagName('unit');
+            attrs = struct('name',{'name','dimensionality','value'},...
+                'default',{'',[],1},...
+                'hook',{@char,@ureg.get_value,@ureg.get_value});
             for idx = 0:xunits.getLength-1
                 xunit = xunits.item(idx);
-                name = char(xunit.getAttribute('name'));
-                dimensionality = xunit.getAttribute('dimensionality');
-                if dimensionality.isEmpty
-                    dimensionality = [];
-                elseif ureg.isKey(char(dimensionality))
-                    dimensionality = subsref(ureg,substruct('()',{char(dimensionality)}));
-                else
-                    dimensionality = Quantities.dimension(char(dimensionality));
-                end
-                xaliases = xunit.getElementsByTagName('alias');
-                num_aliases = xaliases.getLength;
-                aliases = cell(1,num_aliases);
-                for ai = 0:num_aliases-1
-                    aliases{ai+1} = char(xaliases.item(ai).getTextContent);
-                end
-                value = xunit.getAttribute('value');
-                if value.isEmpty
-                    value = 1;
-                else
-                    [v,d] = Quantities.unit.parse_name(char(value));
-                    value = 1;
-                    for vi = 1:numel(v)
-                        val = str2double(v{vi});
-                        if isnan(val)
-                            val = strtrim(v{vi});
-                            try
-                                val = subsref(ureg,substruct('()',{val}));
-                            catch ME
-                                if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
-                                    rethrow(ME)
-                                end
-                                error('unitRegistry:value',...
-                                    'Value refers to key that could not be found.')
-                            end
-                        end
-                        value = value.*val.^d(vi);
-                    end
-                end
-                unit = Quantities.unit(name,dimensionality,value,aliases);
-                subsasgn(ureg,substruct('()',{name}),unit);
-                ureg.units{idx+1} = name; % add name to units cellstring
+                retv = Quantities.unitRegistry.reg_parser(xunit,attrs);
+                aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
+%                 name = char(xunit.getAttribute('name'));
+%                 dimensionality = xunit.getAttribute('dimensionality');
+%                 if dimensionality.isEmpty
+%                     dimensionality = [];
+%                 elseif ureg.isKey(char(dimensionality))
+%                     dimensionality = subsref(ureg,substruct('()',{char(dimensionality)}));
+%                 else
+%                     dimensionality = Quantities.dimension(char(dimensionality));
+%                 end
+%                 xaliases = xunit.getElementsByTagName('alias');
+%                 num_aliases = xaliases.getLength;
+%                 aliases = cell(1,num_aliases);
+%                 for ai = 0:num_aliases-1
+%                     aliases{ai+1} = char(xaliases.item(ai).getTextContent);
+%                 end
+%                 value = xunit.getAttribute('value');
+%                 if value.isEmpty
+%                     value = 1;
+%                 else
+%                     [v,d] = Quantities.unit.parse_name(char(value));
+%                     value = 1;
+%                     for vi = 1:numel(v)
+%                         val = str2double(v{vi});
+%                         if isnan(val)
+%                             val = strtrim(v{vi});
+%                             try
+%                                 val = subsref(ureg,substruct('()',{val}));
+%                             catch ME
+%                                 if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
+%                                     rethrow(ME)
+%                                 end
+%                                 error('unitRegistry:value',...
+%                                     'Value refers to key that could not be found.')
+%                             end
+%                         end
+%                         value = value.*val.^d(vi);
+%                     end
+%                 end
+                unit = Quantities.unit(retv{:},aliases);
+                subsasgn(ureg,substruct('()',{unit.name}),unit);
+                ureg.units{idx+1} = unit.name; % add name to units cellstring
             end
         end
         function F = subsref(ureg,s)
@@ -206,7 +211,7 @@ classdef unitRegistry < containers.Map
                 if isnan(val)
                     val = strtrim(v{idx});
                     try
-                        val = subsref(ureg,substruct('()',val));
+                        val = subsref(ureg,substruct('()',{val}));
                     catch ME
                         if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                             rethrow(ME)
