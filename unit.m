@@ -349,6 +349,8 @@ classdef unit < double
             m = numel(subexps);
             subexps = [subexps,[tks{:}]];
             uname = splits{1};
+            % TODO: use strjoin to create string statically instead of
+            % growing it dynamically
             for n = 1:numel(tks)
                 uname = [uname,'@',num2str(m+n),splits{n+1}];
             end
@@ -375,9 +377,9 @@ classdef unit < double
             tks = regexp(splits{1},pattern,'tokens');
             if ~isempty(tks)
                 bases(1) = tks{1}(1);
-                fraction = strfind(tks{1}{2},'/');
                 assert(isempty(strfind(tks{1}{2},'*')),'unit:parse_bases',...
                     'No multiplication allowed in exponent.');
+                fraction = strfind(tks{1}{2},'/');
                 if isempty(fraction)
                     degrees(1) = str2double(tks{1}{2});
                 elseif isscalar(fraction)
@@ -403,9 +405,9 @@ classdef unit < double
                 tks = regexp(splits{n+1},pattern,'tokens');
                 if ~isempty(tks)
                     bases(n+1) = tks{1}(1);
-                    fraction = strfind(tks{1}{2},'/');
                     assert(isempty(strfind(tks{1}{2},'*')),'unit:parse_bases',...
                         'No multiplication allowed in exponent.');
+                    fraction = strfind(tks{1}{2},'/');
                     if isempty(fraction)
                         degrees(n+1) = str2double(tks{1}{2})*exponent_sign;
                     elseif isscalar(fraction)
@@ -427,6 +429,8 @@ classdef unit < double
             [uname,subexps] = Quantities.unit.parse_parentheses(uname);
             [bases,degrees] = Quantities.unit.parse_bases(uname);
             next = cell(1,2);
+            % TODO: use strjoin to create `bases` and `degrees` statically
+            % instead of growing them dynamically
             for n = 1:numel(subexps)
                 if all(cellfun(@isempty,next))
                     [subbases,subdegrees] = Quantities.unit.parse_bases(subexps{n});
