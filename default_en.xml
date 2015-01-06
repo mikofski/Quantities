@@ -84,6 +84,84 @@
   <unit name="cmil" value="5.067075e-10*m^2" dimensionality="area">
     <alias>circular_mils</alias>
   </unit>
+  <unit name="darcy" value="9.869233e-13*m^2" />
+  <unit name="acre" value="4046.8564224*m^2">
+    <alias>international_acre</alias>
+  </unit>
+  <unit name="US_survey_acre" value="160*rod^2" />
+
+  <!-- EM -->
+  <unit name="esu" value="1*erg^0.5*centimeter^0.5"
+    dimensionality="length^1.5*mass^0.5*time^-1">
+    <alias>statcoulombs</alias>
+    <alias>statC</alias>
+    <alias>franklin</alias>
+    <alias>Fr</alias>
+  </unit>
+  <unit name="esu_per_second" value="1 * esu / second">
+    <alias>statampere</alias>
+  </unit>
+  <unit name="ampere_turn" value="1 * A" />
+  <unit name="gilbert" value="10 / (4 * pi ) * ampere_turn" />
+  <unit name="coulomb" value="ampere * second">
+    <alias>C</alias>
+  </unit>
+  <unit name="volt" value="joule / coulomb">
+    <alias>V</alias>
+  </unit>
+  <unit name="farad" value="coulomb / volt">
+    <alias>F</alias>
+  </unit>
+  <unit name="ohm" value="volt / ampere">
+    <alias>Ω</alias>
+  </unit>
+  <unit name="siemens" value="ampere / volt">
+    <alias>S</alias>
+    <alias>mho</alias>
+  </unit>
+  <unit name="weber" value="volt * second">
+    <alias>Wb</alias>
+  </unit>
+  <unit name="tesla" value="weber / meter ^ 2">
+    <alias>T</alias>
+  </unit>
+  <unit name="henry" value="weber / ampere">
+    <alias>H</alias>
+  </unit>
+  <unit name="elementary_charge" value="1.602176487e-19 * coulomb">
+    <alias>e</alias>
+  </unit>
+  <unit name="chemical_faraday" value="9.64957e4 * coulomb" />
+  <unit name="physical_faraday" value="9.65219e4 * coulomb" />
+  <unit name="faraday" value="96485.3399 * coulomb">
+    <alias>C12_faraday</alias>
+  </unit>
+  <unit name="gamma" value="1e-9 * tesla" />
+  <unit name="gauss" value="1e-4 * tesla" />
+  <unit name="maxwell" value="1e-8 * weber">
+    <alias>mx</alias>
+  </unit>
+  <unit name="oersted" value="1000 / (4 * pi) * A / m">
+    <alias>Oe</alias>
+  </unit>
+  <unit name="statfarad" value="1.112650e-12 * farad">
+    <alias>statF</alias>
+    <alias>stF</alias>
+  </unit>
+  <unit name="stathenry" value="8.987554e11 * henry">
+    <alias>statH</alias>
+    <alias>stH</alias>
+  </unit>
+  <unit name="statmho" value="1.112650e-12 * siemens">
+    <alias>statS</alias>
+    <alias>stS</alias>
+  </unit>
+  <unit name="statohm" value="8.987554e11 * ohm" />
+  <unit name="statvolt" value="2.997925e2 * volt">
+    <alias>statV</alias>
+    <alias>stV</alias>
+  </unit>
+  <unit name="unit_pole" value="1.256637e-7 * weber" />
 
   <!-- Length -->
   <unit name="angstrom" value="1e-10*meter" dimensionality="length"/>
@@ -113,25 +191,30 @@
   <unit name="parsec" value="3.08568025e16*meter" dimensionality="length">
     <alias>pc</alias>
   </unit>
-  <unit name="light_year" value="speed_of_light*julian_year" dimensionality="length">
+  <unit name="light_year" value="speed_of_light*julian_year"
+    dimensionality="length">
     <alias>ly</alias>
     <alias>lightyear</alias>
   </unit>
-  <unit name="astronomical_unit" value="149597870691*meter" dimensionality="length">
+  <unit name="astronomical_unit" value="149597870691*meter"
+    dimensionality="length">
     <alias>au</alias>
   </unit>
   <unit name="nautical_mile" value="1.852e3*meter" dimensionality="length">
     <alias>nmi</alias>
   </unit>
-  <unit name="printers_point" value="127*millimeter/360" dimensionality="length">
+  <unit name="printers_point" value="127*millimeter/360"
+    dimensionality="length">
     <alias>point</alias>
   </unit>
   <unit name="printers_pica" value="12*printers_point" dimensionality="length">
     <alias>pica</alias>
   </unit>
   <unit name="US_survey_foot" value="1200*meter/3937" dimensionality="length"/>
-  <unit name="US_survey_yard" value="3*US_survey_foot" dimensionality="length"/>
-  <unit name="US_survey_mile" value="5280*US_survey_foot" dimensionality="length">
+  <unit name="US_survey_yard" value="3*US_survey_foot"
+    dimensionality="length"/>
+  <unit name="US_survey_mile" value="5280*US_survey_foot"
+    dimensionality="length">
     <alias>US_statute_mile</alias>
   </unit>
   <unit name="rod" value="16.5*US_survey_foot" dimensionality="length">

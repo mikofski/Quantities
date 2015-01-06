@@ -11,6 +11,7 @@ classdef prefix < double
                 value = 1;
             end
             % value must be either numeric or a dimension class
+            % can't filter real/finite without allowing index/assignment
             validateattributes(value,{'numeric'},{'scalar'},'prefix','value',2)
             pre = pre@double(value); % required for subclass of double
             pre.name = name;
@@ -23,6 +24,24 @@ classdef prefix < double
                 pre.aliases = aliases;
             end
         end
+        % no subsref or subsasgn
+        function F = subsref(pre,s)
+            switch s(1).type
+                case {'()','{}'}
+                    error('prefix:subsref','Prefix is scalar - do not index.')
+                otherwise
+                    F = subsref@double(pre,s);
+            end
+        end
+        function F = subsasgn(pre1,s,pre2)
+            switch s(1).type
+                case {'()','{}'}
+                    error('prefix:subsasgn','Prefix is scalar - do not index.')
+                otherwise
+                    F = subsasgn@double(pre1,s,pre2);
+            end
+        end
+        % no horzcat, vertcat or cat
         function F = times(pre,u)
             validateattributes(u,{'Quantities.unit'},{'scalar'},'times','u',2)
             assert(u.value==1,'prefix:times',...

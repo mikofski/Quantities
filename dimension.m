@@ -13,6 +13,7 @@ classdef dimension < double
             end
             % value must be either numeric or a dimension class
             % since 'Quantities.dimension' is double it _is_ numeric
+            % can't filter real/finite without allowing index/assignment
             validateattributes(value,{'numeric'},{'scalar'},'dimension','value',2)
             dim = dim@double(value); % required for subclass of double
             validateattributes(name,{'char'},{'row'},'dimension','name',1)
@@ -34,6 +35,24 @@ classdef dimension < double
         function str = char(dim)
             str = dim.name;
         end
+        % no subsref or subsasgn
+        function F = subsref(dim,s)
+            switch s(1).type
+                case {'()','{}'}
+                    error('dimension:subsref','Dimension is scalar - do not index.')
+                otherwise
+                    F = subsref@double(dim,s);
+            end
+        end
+        function F = subsasgn(dim1,s,dim2)
+            switch s(1).type
+                case {'()','{}'}
+                    error('dimension:subsasgn','Dimension is scalar - do not index.')
+                otherwise
+                    F = subsasgn@double(dim1,s,dim2);
+            end
+        end
+        % no horzcat, vertcat or cat
         function F = times(dim1,dim2)
             if isa(dim1,'Quantities.dimension') && isa(dim2,'Quantities.dimension')
                 if dim1.value==1 && isa(dim2.value,'Quantities.dimension')
@@ -92,19 +111,14 @@ classdef dimension < double
             F = dim2./dim1;
         end
         function F = power(dim,x)
-            validateattributes(dim,{'Quantities.dimension'},{'scalar'},'power','dim',1)
-            validateattributes(x,{'numeric',},{'scalar','integer'},'power','x',2)
+            validateattributes(x,{'numeric'},{'scalar','real','finite'},...
+                'power','x',2)
             F = 1;
             if x==0
                 return
             end
-            for n = 1:abs(x)
-                if x>0
-                    F = F.*dim;
-                else
-                    F = F./dim;
-                end
-            end
+            F = Quantities.dimension(['(',dim.name,')^',num2str(x)],dim.value.^x);
+            F = F.combine;
         end
         function F = mpower(dim,x)
             F = dim.^x;

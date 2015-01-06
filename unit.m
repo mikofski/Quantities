@@ -19,6 +19,7 @@ classdef unit < double
             end
             % value must be either numeric or a quantity class
             % since 'Quantities.quantity' is double it _is_ numeric!
+            % can't filter real/finite without allowing index/assignment
             validateattributes(value,{'numeric'},{'scalar'},'unit','value',3)
             u = u@double(value); % required for subclass of double
             % parse arguments
@@ -73,7 +74,7 @@ classdef unit < double
         function F = subsref(u,s)
             switch s(1).type
                 case {'()','{}'}
-                    error('unit:subsref','Unit is scalar - do not index Unit.')
+                    error('unit:subsref','Unit is scalar - do not index.')
                 otherwise
                     F = subsref@double(u,s);
             end
@@ -81,7 +82,7 @@ classdef unit < double
         function F = subsasgn(u,s,v)
             switch s(1).type
                 case {'()','{}'}
-                    error('unit:subsasgn','Unit is scalar - do not index Unit.')
+                    error('unit:subsasgn','Unit is scalar - do not index.')
                 otherwise
                     F = subsasgn@double(u,s,v);
             end
@@ -281,17 +282,15 @@ classdef unit < double
             F = u.\v;
         end
         function F = power(u,n)
+            validateattributes(n,{'numeric'},{'scalar','real','finite'},...
+                'power','n',2)
             F = 1;
             if n==0
                 return
             end
-            for m = 1:abs(n)
-                if n>0
-                    F = F.*u;
-                else
-                    F = F./u;
-                end
-            end
+            F = Quantities.unit(['(',u.name,')^',num2str(n)],...
+                u.dimensionality.^n,u.value.^n);
+            F = F.combine;
         end
         function F = mpower(u,n)
             F = u.^n;
@@ -341,7 +340,9 @@ classdef unit < double
             if nargin<2
                 subexps = {};
             end
-            [tks,splits] = regexp(uname,'\(([@\w +\-*/^]*)\)','tokens','split');
+            % do not match exponents in parentheses
+            [tks,splits] = regexp(uname,'(?<!\^)\(([@\w .+\-*/^]*)\)',...
+                'tokens','split');
             if isempty(tks)
                 return
             end
@@ -355,7 +356,9 @@ classdef unit < double
         end
         function [bases,degrees] = parse_bases(uname)
             % find bases
-            [matches,splits] = regexp(uname,'[*/]*','match','split');
+            [matches,splits] = regexp(uname,'(?<!\^\([.+\-\d]+)[*/]?(?![.+\-\d]+\))','match','split');
+            assert(~any(cellfun(@isempty,splits)),'unit:parse_bases',...
+                'Repeated multiplication or division, IE: "**, */ or //".')
             if isempty(splits{1})
                 bases = {};
                 degrees = [];
@@ -364,27 +367,53 @@ classdef unit < double
             sz = size(splits);
             bases = cell(sz);
             degrees = ones(sz);
-            tks = regexp(splits{1},'(@?\w+)\^((?<=\^)[.+\-\d]+)','tokens');
+            % nonmatching look behind is _not_ needed because using groups
+            % allow but do not group exponents in parentheses
+            % allow fraction in exponent
+            pattern = '(@?\w+)\^\(?([.+\-\d/]+)\)?';
+            tks = regexp(splits{1},pattern,'tokens');
             if ~isempty(tks)
                 bases(1) = tks{1}(1);
-                degrees(1) = str2double(tks{1}{2});
+                fraction = strfind(tks{1}{2},'/');
+                if isempty(fraction)
+                    degrees(1) = str2double(tks{1}{2});
+                elseif isscalar(fraction)
+                    numerator = str2double(tks{1}{2}(1:fraction-1));
+                    denominator = str2double(tks{1}{2}(fraction+1:end));
+                    degrees(1) = numerator/denominator;
+                else
+                    error('unit:parse_bases',...
+                        'Only one fraction allowed in exponent.')
+                end
             else
                 bases(1) = splits(1);
             end
             for n = 1:numel(matches)
                 switch matches{n}
                     case '*'
-                        numerator_denominator = 1;
+                        exponent_sign = 1;
                     case '/'
-                        numerator_denominator = -1;
+                        exponent_sign = -1;
                 end
-                tks = regexp(splits{n+1},'(@?\w+)\^((?<=\^)[.+\-\d]+)','tokens');
+                % use same pattern
+                % TODO: refactor to remove redundant code
+                tks = regexp(splits{n+1},pattern,'tokens');
                 if ~isempty(tks)
                     bases(n+1) = tks{1}(1);
-                    degrees(n+1) = str2double(tks{1}{2})*numerator_denominator;
+                    fraction = strfind(tks{1}{2},'/');
+                    if isempty(fraction)
+                        degrees(n+1) = str2double(tks{1}{2})*exponent_sign;
+                    elseif isscalar(fraction)
+                        numerator = str2double(tks{1}{2}(1:fraction-1));
+                        denominator = str2double(tks{1}{2}(fraction+1:end));
+                        degrees(n+1) = numerator/denominator*exponent_sign;
+                    else
+                        error('unit:parse_bases',...
+                            'Only one fraction allowed in exponent.')
+                    end
                 else
                     bases(n+1) = splits(n+1);
-                    degrees(n+1) = numerator_denominator;
+                    degrees(n+1) = exponent_sign;
                 end
             end
         end
