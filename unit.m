@@ -314,7 +314,7 @@ classdef unit < double
                     uname{jdx} = [b{1},'^',num2str(degree)];
                 end
             end
-            if iscellstr(uname)
+            if ~isempty(uname) && iscellstr(uname)
                 uname = strjoin(uname,'*');
                 F = Quantities.unit(uname,u.dimensionality,u.value,u.aliases);
             else

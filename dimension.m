@@ -167,11 +167,11 @@ classdef dimension < double
                     dim_name{jdx} = [d{1},'^',num2str(degree)];
                 end
             end
-            if iscellstr(dim_name)
+            if ~isempty(dim_name) && iscellstr(dim_name)
                 dim_name = strjoin(dim_name,'*');
                 F = Quantities.dimension(dim_name,dim.value);
             else
-                F = 1;
+                F = [];
             end
         end
     end
