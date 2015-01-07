@@ -62,7 +62,9 @@ classdef unitRegistry < containers.Map
             nxml = nxml_prefixes+nxml_dims+nxml_consts+nxml_units;
             lastcount = -1;
             nreg = 0;
-            while nreg<nxml && lastcount~=nreg
+            while nreg<nxml
+                assert(lastcount~=nreg,'unitRegistry:xmlfile',...
+                    'The xml file either has a missing dependency or is circular.')
                 % number of values in registry
                 nreg_prefixes = numel(ureg.prefixes);
                 nreg_dims = numel(ureg.dimensions);
@@ -73,59 +75,67 @@ classdef unitRegistry < containers.Map
                 % prefixes
                 attrs = struct('name',{'name','value'},'default',{'',1},...
                     'hook',{@char,@ureg.get_value});
+                jdx = nreg_prefixes;
                 for idx = nreg_prefixes:nxml_prefixes-1
                     xprefix = xprefixes.item(idx);
                     retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
                     if ureg.status<0
                         continue
                     end
+                    jdx = jdx+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
                     pre = Quantities.prefix(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{pre.name}),pre);
-                    ureg.prefixes{idx+1} = pre.name;
+                    ureg.prefixes{jdx} = pre.name;
                     ureg.logging('debug','loading prefix: %s',pre.name)
                 end
                 % dimensions
                 % uses same attributes from prefixes
+                jdx = nreg_dims;
                 for idx = nreg_dims:nxml_dims-1
                     xdim = xdims.item(idx);
                     retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
                     if ureg.status<0
                         continue
                     end
+                    jdx = jdx+1;
                     dim = Quantities.dimension(retv{:});
                     subsasgn(ureg,substruct('()',{dim.name}),dim);
-                    ureg.dimensions{idx+1} = dim.name;
+                    ureg.dimensions{jdx} = dim.name;
                     ureg.logging('debug','loading dimension: %s',dim.name)
                 end
                 % constants
                 % uses same attributes from prefixes
+                jdx = nreg_consts;
                 for idx = nreg_consts:nxml_consts-1
                     xconst = xconsts.item(idx);
                     retv = Quantities.unitRegistry.reg_parser(xconst,attrs);
                     if ureg.status<0
                         continue
                     end
+                    jdx = jdx+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
                     const = Quantities.constant(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{const.name}),const);
-                    ureg.constants{idx+1} = const.name;
+                    ureg.constants{jdx} = const.name;
                     ureg.logging('debug','loading constant: %s',const.name)
                 end
                 % units
                 attrs = struct('name',{'name','dimensionality','value'},...
                     'default',{'',[],1},...
                     'hook',{@char,@ureg.get_value,@ureg.get_value});
+                jdx = nreg_units;
                 for idx = nreg_units:nxml_units-1
                     xunit = xunits.item(idx);
                     retv = Quantities.unitRegistry.reg_parser(xunit,attrs);
                     if ureg.status<0
                         continue
                     end
+                    jdx = jdx+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
                     unit = Quantities.unit(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{unit.name}),unit);
-                    ureg.units{idx+1} = unit.name; % add name to units cellstring
+                    ureg.units{jdx} = unit.name; % add name to units cellstring
                     ureg.logging('debug','loading unit: %s',unit.name)
                 end
             end
