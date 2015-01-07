@@ -10,3 +10,4 @@
 <!-- derived -->
 <dimension name="acceleration" value="length/time^2"/>
 <dimension name="area" value="length^2"/>
+<dimension name="energy" value="force*length"/>

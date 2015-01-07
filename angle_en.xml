@@ -1,0 +1,28 @@
+<unit name="turn" value="2*pi*radian">
+  <alias>revolution</alias>
+  <alias>cycle</alias>
+  <alias>circle</alias>
+</unit>
+
+<unit name="degree" value="pi/180*radian">
+  <alias>deg</alias>
+  <alias>arcdeg</alias>
+  <alias>arcdegree</alias>
+  <alias>angular_degree</alias>
+</unit>
+
+<unit name="arcminute" value="arcdeg/60">
+  <alias>arcmin</alias>
+  <alias>arc_minute</alias>
+  <alias>angular_minute</alias>
+</unit>
+
+<unit name="arcsecond" value="arcmin/60">
+  <alias>arcsec</alias>
+  <alias>arc_second</alias>
+  <alias>angular_second</alias>
+</unit>
+
+<unit name="steradian" value="radian^2">
+  <alias>sr</alias>
+</unit>
