@@ -1,17 +1,17 @@
-<unit name="are" value="100*m^2" dimensionality="area"/>
+<unit name="are" value="100*m^2"/>
 
-<unit name="barn" value="1e-28*m^2" dimensionality="area">
+<unit name="barn" value="1e-28*m^2">
   <alias>b</alias>
 </unit>
 
-<unit name="cmil" value="5.067075e-10*m^2" dimensionality="area">
+<unit name="cmil" value="5.067075e-10*m^2">
   <alias>circular_mils</alias>
 </unit>
 
-<unit name="darcy" value="9.869233e-13*m^2" dimensionality="area"/>
+<unit name="darcy" value="9.869233e-13*m^2"/>
 
-<unit name="acre" value="4046.8564224*m^2" dimensionality="area">
+<unit name="acre" value="4046.8564224*m^2">
   <alias>international_acre</alias>
 </unit>
 
-<unit name="US_survey_acre" value="160*rod^2" dimensionality="area"/>
+<unit name="US_survey_acre" value="160*rod^2"/>

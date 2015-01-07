@@ -1,7 +1,6 @@
 classdef constant < Quantities.quantity
     properties (SetAccess=immutable)
         name
-        value
         aliases
     end
     properties (Constant)
@@ -15,7 +14,6 @@ classdef constant < Quantities.quantity
                 'constant','value',2)
             const = const@Quantities.quantity(value.average,value.stdev,value.units);
             const.name = name;
-            const.value = value;
             % parse aliases
             if nargin>2 && ~isempty(aliases)
                 validateattributes(aliases,{'cell'},{'vector'},'unit','aliases',4)

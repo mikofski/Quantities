@@ -136,6 +136,11 @@ classdef unitRegistry < containers.Map
                     end
                     jdx = jdx+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
+                    if isa(retv{3},'Quantities.unit')
+                        retv{2} = retv{3}.dimensionality;
+                    elseif isa(retv{3},'Quantities.quantity')
+                        retv{2} = retv{3}.units.dimensionality;
+                    end
                     unit = Quantities.unit(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{unit.name}),unit);
                     ureg.units{jdx} = unit.name; % add name to units cellstring

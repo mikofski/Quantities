@@ -1,25 +1,23 @@
-<unit name="esu" value="erg^0.5*centimeter^0.5"
-      dimensionality="(energy*length)^0.5">
+<unit name="esu" value="erg^0.5*centimeter^0.5">
   <alias>statcoulombs</alias>
   <alias>statC</alias>
   <alias>franklin</alias>
   <alias>Fr</alias>
 </unit>
 
-<unit name="esu_per_second" value="esu/second"
-      dimensionality="(energy*length/time^2)^0.5">
+<unit name="esu_per_second" value="esu/second">
   <alias>statampere</alias>
 </unit>
 
-<unit name="ampere_turn" value="A" dimensionality="current"/>
+<unit name="ampere_turn" value="A"/>
 
-<unit name="gilbert" value="10/(4*pi)*ampere_turn" dimensionality="current"/>
+<unit name="gilbert" value="10/(4*pi)*ampere_turn"/>
 
-<unit name="coulomb" value="ampere*second" dimensionality="current*time">
+<unit name="coulomb" value="ampere*second">
   <alias>C</alias>
 </unit>
 
-<unit name="volt" value="joule/coulomb" dimensionality="power/current">
+<unit name="volt" value="joule/coulomb">
   <alias>V</alias>
 </unit>
 
@@ -28,34 +26,39 @@
   <alias>F</alias>
 </unit>
 
-<unit name="ohm" value="volt/ampere" dimensionality="power/current^2">
+<unit name="ohm" value="volt/ampere">
   <alias>Ω</alias>
 </unit>
 
-<unit name="siemens" value="ampere/volt" dimensionality="current^2/power">
+<unit name="siemens" value="ampere/volt">
   <alias>S</alias>
   <alias>mho</alias>
 </unit>
 
-<unit name="weber" value="volt*second" dimensionality="energy/current">
+<unit name="weber" value="volt*second">
   <alias>Wb</alias>
 </unit>
 
-<unit name="tesla" value="weber/meter^2" dimensionality="energy/current/length^2">
+<unit name="tesla" value="weber/meter^2">
   <alias>T</alias>
 </unit>
 
 <unit name="henry" value="weber/ampere">
   <alias>H</alias>
 </unit>
+
 <unit name="elementary_charge" value="1.602176487e-19*coulomb">
   <alias>e</alias>
 </unit>
+
 <unit name="chemical_faraday" value="9.64957e4*coulomb"/>
+
 <unit name="physical_faraday" value="9.65219e4*coulomb"/>
+
 <unit name="faraday" value="96485.3399*coulomb">
   <alias>C12_faraday</alias>
 </unit>
+
 <unit name="gamma" value="1e-9*tesla"/>
 <unit name="gauss" value="1e-4*tesla"/>
 <unit name="maxwell" value="1e-8*weber">
