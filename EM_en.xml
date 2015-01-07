@@ -7,7 +7,7 @@
 </unit>
 
 <unit name="esu_per_second" value="esu/second"
-      dimensionality="length^1.5*mass^0.5*time^-2">
+      dimensionality="(energy*length/time^2)^0.5">
   <alias>statampere</alias>
 </unit>
 
@@ -23,22 +23,28 @@
   <alias>V</alias>
 </unit>
 
-<unit name="farad" value="coulomb/volt">
+<unit name="farad" value="coulomb/volt"
+      dimensionality="(current*second)^2/energy">
   <alias>F</alias>
 </unit>
-<unit name="ohm" value="volt/ampere">
+
+<unit name="ohm" value="volt/ampere" dimensionality="power/current^2">
   <alias>Ω</alias>
 </unit>
-<unit name="siemens" value="ampere/volt">
+
+<unit name="siemens" value="ampere/volt" dimensionality="current^2/power">
   <alias>S</alias>
   <alias>mho</alias>
 </unit>
-<unit name="weber" value="volt*second">
+
+<unit name="weber" value="volt*second" dimensionality="energy/current">
   <alias>Wb</alias>
 </unit>
-<unit name="tesla" value="weber/meter^2">
+
+<unit name="tesla" value="weber/meter^2" dimensionality="energy/current/length^2">
   <alias>T</alias>
 </unit>
+
 <unit name="henry" value="weber/ampere">
   <alias>H</alias>
 </unit>

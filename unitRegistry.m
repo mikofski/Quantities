@@ -9,7 +9,7 @@ classdef unitRegistry < containers.Map
         status = 0 % status of upload
     end
     properties (Constant)
-        DEFAULT = Quantities.unitRegistry('v',3)
+        LOG_LEVELS = {'info','debug','warning'}
     end
     methods
         function ureg = unitRegistry(varargin)
@@ -190,7 +190,7 @@ classdef unitRegistry < containers.Map
                             elseif any(alias_idx);
                                 % get alias
                                 prefix_alias = prefix.aliases(alias_idx);
-                                assert(isscalar(alias_idx),...
+                                assert(sum(alias_idx)==1,...
                                     'unitRegistry:subsref',...
                                     'Prefix aliases can''t have same first letter.')
                                 prefix_alias = prefix_alias{1};
@@ -231,6 +231,17 @@ classdef unitRegistry < containers.Map
                         end
                         throw(ME)
                     end
+                case '.'
+                    % allow dot notation indexing for registry contents
+                    try
+                        stry = s;stry(1).type = '()';stry(1).subs = {s(1).subs};
+                        F = subsref(ureg,stry);
+                    catch ME
+                        if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
+                            rethrow(ME)
+                        end
+                        F = subsref@containers.Map(ureg,s);
+                    end
                 otherwise
                     F = subsref@containers.Map(ureg,s);
             end
@@ -257,9 +268,10 @@ classdef unitRegistry < containers.Map
             end
         end
         function logging(ureg,level,msg,varargin)
-            levels = {'info','debug','warning'};
-            level = validatestring(level,levels,'logging','level',2);
-            level = strcmp(level,{'info','debug','warning'})*(1:numel(levels))';
+            nlevels = 1:numel(Quantities.unitRegistry.LOG_LEVELS);
+            level = validatestring(level,Quantities.unitRegistry.LOG_LEVELS,...
+                'logging','level',2);
+            level = nlevels(strcmp(level,{'info','debug','warning'}));
             if ureg.verbosity>=level
                 fprintf([msg,'\n'],varargin{:});
             end
