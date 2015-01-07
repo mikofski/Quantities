@@ -1,0 +1,9 @@
+newton = kilogram * meter / second ** 2 = N
+dyne = gram * centimeter / second ** 2 = dyn
+force_kilogram = g_0 * kilogram = kgf = kilogram_force = pond
+force_gram = g_0 * gram = gf = gram_force
+force_ounce = g_0 * ounce = ozf = ounce_force
+force_pound = g_0 * lb = lbf = pound_force
+force_ton = 2000 * force_pound = ton_force
+poundal = lb * feet / second ** 2 = pdl
+kip = 1000*lbf

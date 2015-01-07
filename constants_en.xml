@@ -22,3 +22,17 @@
   <alias>impedance_of_free_space</alias>
   <alias>characteristic_impedance_of_vacuum</alias>
 </constant>
+
+planck_constant = 6.62606957e-34 J s = h
+hbar = planck_constant / (2 * pi) = ħ
+newtonian_constant_of_gravitation = 6.67384e-11 m^3 kg^-1 s^-2
+molar_gas_constant = 8.3144621 J mol^-1 K^-1 = R
+fine_structure_constant = 7.2973525698e-3
+avogadro_number = 6.02214129e23 mol^-1 =N_A
+boltzmann_constant = 1.3806488e-23 J K^-1 = k
+stefan_boltzmann_constant = 5.670373e-8 W m^-2 K^-4 = σ
+wien_frequency_displacement_law_constant = 5.8789254e10 Hz K^-1
+rydberg_constant = 10973731.568539 m^-1
+electron_mass = 9.10938291e-31 kg = m_e
+neutron_mass = 1.674927351e-27 kg = m_n
+proton_mass = 1.672621777e-27 kg = m_p

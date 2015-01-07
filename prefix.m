@@ -10,7 +10,8 @@ classdef prefix < double
             if nargin<2
                 value = 1;
             end
-            % value must be either numeric or a dimension class
+            validateattributes(name,{'char'},{'row'},'dimension','name',1)
+            % value must be either numeric
             % can't filter real/finite without allowing index/assignment
             validateattributes(value,{'numeric'},{'scalar'},'prefix','value',2)
             pre = pre@double(value); % required for subclass of double

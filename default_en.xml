@@ -8,6 +8,8 @@
 <!ENTITY area SYSTEM "area_en.xml">
 <!ENTITY angle SYSTEM "angle_en.xml">
 <!ENTITY EM SYSTEM "EM_en.xml">
+<!ENTITY energy SYSTEM "energy_en.xml">
+<!ENTITY force SYSTEM "force_en.xml">
 ]>
 
 <ureg>
@@ -74,5 +76,11 @@
 
   <!-- EM -->
   &EM;
+
+  <!-- Energy -->
+  &energy;
+
+  <!-- Force -->
+  &force;
   
 </ureg>

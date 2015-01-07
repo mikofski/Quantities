@@ -1,13 +1,3 @@
-<!-- reference -->
-<dimension name="length"/>
-<dimension name="time"/>
-<dimension name="current"/>
-<dimension name="luminosity"/>
-<dimension name="mass"/>
-<dimension name="substance"/>
-<dimension name="temperature"/>
-
-<!-- derived -->
 <dimension name="frequency" value="1/time"/>
 <dimension name="speed" value="length/time"/>
 <dimension name="acceleration" value="length/time^2"/>

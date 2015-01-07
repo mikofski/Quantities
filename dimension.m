@@ -11,12 +11,12 @@ classdef dimension < double
             if nargin<2
                 value = 1;
             end
+            validateattributes(name,{'char'},{'row'},'dimension','name',1)
             % value must be either numeric or a dimension class
             % since 'Quantities.dimension' is double it _is_ numeric
             % can't filter real/finite without allowing index/assignment
             validateattributes(value,{'numeric'},{'scalar'},'dimension','value',2)
             dim = dim@double(value); % required for subclass of double
-            validateattributes(name,{'char'},{'row'},'dimension','name',1)
             dim.name = name;
             if nargin>1
                 % value must equal 1 if not a dimension class

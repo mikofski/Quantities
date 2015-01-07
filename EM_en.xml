@@ -60,28 +60,37 @@
 </unit>
 
 <unit name="gamma" value="1e-9*tesla"/>
+
 <unit name="gauss" value="1e-4*tesla"/>
+
 <unit name="maxwell" value="1e-8*weber">
   <alias>mx</alias>
 </unit>
+
 <unit name="oersted" value="1000/(4*pi)*A/m">
   <alias>Oe</alias>
 </unit>
+
 <unit name="statfarad" value="1.112650e-12*farad">
   <alias>statF</alias>
   <alias>stF</alias>
 </unit>
+
 <unit name="stathenry" value="8.987554e11*henry">
   <alias>statH</alias>
   <alias>stH</alias>
 </unit>
+
 <unit name="statmho" value="1.112650e-12*siemens">
   <alias>statS</alias>
   <alias>stS</alias>
 </unit>
+
 <unit name="statohm" value="8.987554e11*ohm"/>
+
 <unit name="statvolt" value="2.997925e2*volt">
   <alias>statV</alias>
   <alias>stV</alias>
 </unit>
+
 <unit name="unit_pole" value="1.256637e-7*weber"/>

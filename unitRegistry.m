@@ -56,9 +56,9 @@ classdef unitRegistry < containers.Map
                 assert(lastcount~=nreg,'unitRegistry:xmlfile',...
                     'The xml file either has a missing dependency or is circular.')
                 % prefixes
+                ureg.status = 0; % reset status
                 attrs = struct('name',{'name','value'},'default',{'',1},...
                     'hook',{@char,@ureg.get_value});
-                jdx = nreg_prefixes;
                 for idx = 0:nxml_prefixes-1
                     xprefix = xprefixes.item(idx);
                     % skip if already loaded
@@ -66,20 +66,24 @@ classdef unitRegistry < containers.Map
                         continue
                     end
                     retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
+                    if retv{2}==attrs(2).default
+                        % reset status since get_value not called
+                        ureg.status = 0;
+                    end
                     % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
-                    jdx = jdx+1;
+                    nreg_prefixes = nreg_prefixes+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
                     pre = Quantities.prefix(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{pre.name}),pre);
-                    ureg.prefixes{jdx} = pre.name;
+                    ureg.prefixes{nreg_prefixes} = pre.name;
                     ureg.logging('debug','loading prefix: %s',pre.name)
                 end
                 % dimensions
+                ureg.status = 0; % reset status
                 % uses same attributes from prefixes
-                jdx = nreg_dims;
                 for idx = 0:nxml_dims-1
                     xdim = xdims.item(idx);
                     % skip if already loaded
@@ -87,19 +91,23 @@ classdef unitRegistry < containers.Map
                         continue
                     end
                     retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
+                    if retv{2}==attrs(2).default
+                        % reset status since get_value not called
+                        ureg.status = 0;
+                    end
                     % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
-                    jdx = jdx+1;
+                    nreg_dims = nreg_dims+1;
                     dim = Quantities.dimension(retv{:});
                     subsasgn(ureg,substruct('()',{dim.name}),dim);
-                    ureg.dimensions{jdx} = dim.name;
+                    ureg.dimensions{nreg_dims} = dim.name;
                     ureg.logging('debug','loading dimension: %s',dim.name)
                 end
                 % constants
+                ureg.status = 0; % reset status
                 % uses same attributes from prefixes
-                jdx = nreg_consts;
                 for idx = 0:nxml_consts-1
                     xconst = xconsts.item(idx);
                     % skip if already loaded
@@ -111,18 +119,18 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    jdx = jdx+1;
+                    nreg_consts = nreg_consts+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
                     const = Quantities.constant(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{const.name}),const);
-                    ureg.constants{jdx} = const.name;
+                    ureg.constants{nreg_consts} = const.name;
                     ureg.logging('debug','loading constant: %s',const.name)
                 end
                 % units
+                ureg.status = 0; % reset status
                 attrs = struct('name',{'name','dimensionality','value'},...
                     'default',{'',[],1},...
-                    'hook',{@char,@ureg.get_value,@ureg.get_value});
-                jdx = nreg_units;
+                    'hook',{@char,@char,@ureg.get_value});
                 for idx = 0:nxml_units-1
                     xunit = xunits.item(idx);
                     % skip if already loaded
@@ -134,24 +142,31 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    jdx = jdx+1;
+                    nreg_units = nreg_units+1;
                     aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
+                    % derive dimensionality
                     if isa(retv{3},'Quantities.unit')
                         retv{2} = retv{3}.dimensionality;
                     elseif isa(retv{3},'Quantities.quantity')
                         retv{2} = retv{3}.units.dimensionality;
+                    elseif ~isempty(retv{2})
+                        % reset status since get_value not called
+                        ureg.status = 0;
+                        % create reference dimensions
+                        nreg_dims = nreg_dims+1;
+                        dim = Quantities.dimension(retv{2});
+                        subsasgn(ureg,substruct('()',{dim.name}),dim);
+                        ureg.dimensions{nreg_dims} = dim.name;
+                        ureg.logging('debug','loading dimension: %s',dim.name)
+                        retv{2} = dim;
                     end
                     unit = Quantities.unit(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{unit.name}),unit);
-                    ureg.units{jdx} = unit.name; % add name to units cellstring
+                    ureg.units{nreg_units} = unit.name; % add name to units cellstring
                     ureg.logging('debug','loading unit: %s',unit.name)
                 end
                 % number of values in registry
                 lastcount = nreg;
-                nreg_prefixes = numel(ureg.prefixes);
-                nreg_dims = numel(ureg.dimensions);
-                nreg_consts = numel(ureg.constants);
-                nreg_units = numel(ureg.units);
                 nreg = nreg_prefixes+nreg_dims+nreg_consts+nreg_units;
             end
         end
