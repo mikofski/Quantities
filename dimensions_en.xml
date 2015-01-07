@@ -8,6 +8,13 @@
 <dimension name="temperature"/>
 
 <!-- derived -->
+<dimension name="frequency" value="1/time"/>
+<dimension name="speed" value="length/time"/>
 <dimension name="acceleration" value="length/time^2"/>
 <dimension name="area" value="length^2"/>
+<dimension name="volume" value="length^3"/>
+<dimension name="force" value="mass*acceleration"/>
 <dimension name="energy" value="force*length"/>
+<dimension name="power" value="energy/time"/>
+<dimension name="pressure" value="force/area"/>
+<dimension name="viscosity" value="pressure*time"/>

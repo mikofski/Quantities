@@ -4,6 +4,9 @@ classdef constant < Quantities.quantity
         value
         aliases
     end
+    properties (Constant)
+        PI = Quantities.constant('pi',Quantities.quantity(pi))
+    end
     methods
         function const = constant(name,value,aliases)
             validateattributes(name,{'char'},{'row'},...

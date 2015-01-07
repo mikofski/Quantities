@@ -1,53 +1,36 @@
 classdef unitRegistry < containers.Map
     properties (SetAccess=private)
-        xmlfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
+        xmlfile % path to xml file
         prefixes = {} % cell string of prefix keys
         dimensions = {} % cell string of dimension keys
         units = {} % cell string of unit keys
         constants = {} % cell string of constant keys
-        verbosity = 3 % set verbosity 0:none, 1:info, 2:debug, 3:warning
+        verbosity = 0 % set verbosity 0:none, 1:info, 2:debug, 3:warning
         status = 0 % status of upload
     end
     properties (Constant)
-        DEFAULT = Quantities.unitRegistry('')
+        DEFAULT = Quantities.unitRegistry('v',3)
     end
     methods
-        function ureg = unitRegistry(xmlfile,verbosity)
-            pi_const = Quantities.constant('pi',Quantities.quantity(pi));
-%             L = Quantities.dimension('length');
-%             T = Quantities.dimension('time');
-%             M = Quantities.dimension('mass');
-%             a = Quantities.dimension('acceleration',L./T.^2);
-%             F = Quantities.dimension('force',M.*a);
-%             kilo = Quantities.prefix('kilo',1000,{'k'});
-%             deci = Quantities.prefix('deci',0.1,{'d'});
-%             deca = Quantities.prefix('deca',1000,{'da'});
-%             meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
-%             inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
-%             second = Quantities.unit('second',T,1,{'s','seconds'});
-%             gram = Quantities.unit('gram',M,1,{'g','grams'});
-%             newton = Quantities.unit('Newton',F,kilo*gram.*meter./second.^2,...
-%                 {'N','newtons'});
-%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
-%                 'meter','inch','second','gram','length','time','mass',...
-%                 'acceleration','force','newton','kilo','deci','deca','pi'},...
-%                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,gram,...
-%                 L,T,M,a,F,newton,kilo,deci,deca,pi_const});
-%             ureg.prefixes = {'kilo','deci','deca'};
-%             ureg.constants = {'pi'};
-%             ureg.dimensions = {'length','time','mass','acceleration','force'};
-%             ureg.units = {'meter','inch','second','gram','newton'};
+        function ureg = unitRegistry(varargin)
+            % call superclass constructor
             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,'pi'},...
-                {Quantities.unit.DIMENSIONLESS,pi_const});
-            if nargin>0
-                ureg.xmlfile = xmlfile;
+                {Quantities.unit.DIMENSIONLESS,Quantities.constant.PI});
+            % parse inputs
+            p = inputParser;
+            function validate_xmlfile(f)
+                assert(exist(f,'file')==2,'unitRegistry:xmlfile','bad path')                
             end
-            if exist(ureg.xmlfile,'file')==0
-                return
-            end
-            if nargin>1
-                ureg.verbosity = verbosity;
-            end
+            p.addOptional('xmlfile',...
+                fullfile(fileparts(mfilename('fullpath')),'default_en.xml'),...
+                @validate_xmlfile)
+            p.addOptional('verbosity',0,@(arg)validateattributes(arg,{'numeric'},...
+                {'scalar','integer','nonnegative'},'unitRegistry','verbosity',2))
+            p.parse(varargin{:});
+            args = p.Results;
+            ureg.xmlfile = args.xmlfile;
+            ureg.verbosity = args.verbosity;
+            % get xml document object model
             xdoc = xmlread(ureg.xmlfile);
             xroot = xdoc.getDocumentElement;
             % number of values in xmlfile
@@ -60,25 +43,30 @@ classdef unitRegistry < containers.Map
             xunits = xroot.getElementsByTagName('unit');
             nxml_units = xunits.getLength;
             nxml = nxml_prefixes+nxml_dims+nxml_consts+nxml_units;
+            % initialize counts
             lastcount = -1;
+            nreg_prefixes = 0;
+            nreg_dims = 0;
+            nreg_consts = 0;
+            nreg_units = 0;
             nreg = 0;
+            % loop until all xml contents loaded or error thrown
             while nreg<nxml
+                % throw exception if no new xml contents were loaded
                 assert(lastcount~=nreg,'unitRegistry:xmlfile',...
                     'The xml file either has a missing dependency or is circular.')
-                % number of values in registry
-                nreg_prefixes = numel(ureg.prefixes);
-                nreg_dims = numel(ureg.dimensions);
-                nreg_consts = numel(ureg.constants);
-                nreg_units = numel(ureg.units);
-                lastcount = nreg;
-                nreg = nreg_prefixes+nreg_dims+nreg_consts+nreg_units;
                 % prefixes
                 attrs = struct('name',{'name','value'},'default',{'',1},...
                     'hook',{@char,@ureg.get_value});
                 jdx = nreg_prefixes;
-                for idx = nreg_prefixes:nxml_prefixes-1
+                for idx = 0:nxml_prefixes-1
                     xprefix = xprefixes.item(idx);
+                    % skip if already loaded
+                    if any(strcmp(char(xprefix.getAttribute('name')),ureg.prefixes))
+                        continue
+                    end
                     retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
+                    % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
@@ -92,9 +80,14 @@ classdef unitRegistry < containers.Map
                 % dimensions
                 % uses same attributes from prefixes
                 jdx = nreg_dims;
-                for idx = nreg_dims:nxml_dims-1
+                for idx = 0:nxml_dims-1
                     xdim = xdims.item(idx);
+                    % skip if already loaded
+                    if any(strcmp(char(xdim.getAttribute('name')),ureg.dimensions))
+                        continue
+                    end
                     retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
+                    % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
@@ -107,9 +100,14 @@ classdef unitRegistry < containers.Map
                 % constants
                 % uses same attributes from prefixes
                 jdx = nreg_consts;
-                for idx = nreg_consts:nxml_consts-1
+                for idx = 0:nxml_consts-1
                     xconst = xconsts.item(idx);
+                    % skip if already loaded
+                    if any(strcmp(char(xconst.getAttribute('name')),ureg.constants))
+                        continue
+                    end
                     retv = Quantities.unitRegistry.reg_parser(xconst,attrs);
+                    % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
@@ -125,9 +123,14 @@ classdef unitRegistry < containers.Map
                     'default',{'',[],1},...
                     'hook',{@char,@ureg.get_value,@ureg.get_value});
                 jdx = nreg_units;
-                for idx = nreg_units:nxml_units-1
+                for idx = 0:nxml_units-1
                     xunit = xunits.item(idx);
+                    % skip if already loaded
+                    if any(strcmp(char(xunit.getAttribute('name')),ureg.units))
+                        continue
+                    end
                     retv = Quantities.unitRegistry.reg_parser(xunit,attrs);
+                    % skip if missing dependency
                     if ureg.status<0
                         continue
                     end
@@ -138,6 +141,13 @@ classdef unitRegistry < containers.Map
                     ureg.units{jdx} = unit.name; % add name to units cellstring
                     ureg.logging('debug','loading unit: %s',unit.name)
                 end
+                % number of values in registry
+                lastcount = nreg;
+                nreg_prefixes = numel(ureg.prefixes);
+                nreg_dims = numel(ureg.dimensions);
+                nreg_consts = numel(ureg.constants);
+                nreg_units = numel(ureg.units);
+                nreg = nreg_prefixes+nreg_dims+nreg_consts+nreg_units;
             end
         end
         function F = subsref(ureg,s)
@@ -240,8 +250,6 @@ classdef unitRegistry < containers.Map
                         end
                             ureg.status = -1; % key could not be found
                             return
-%                         error('unitRegistry:value',...
-%                             'Value refers to key that could not be found.')
                     end
                 end
                 ureg.status = 0; % success
