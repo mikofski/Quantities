@@ -1,95 +1,133 @@
 classdef unitRegistry < containers.Map
     properties (SetAccess=private)
-        unitsfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
+        xmlfile = fullfile(fileparts(mfilename('fullpath')),'default_en.xml')
         prefixes = {} % cell string of prefix keys
         dimensions = {} % cell string of dimension keys
         units = {} % cell string of unit keys
         constants = {} % cell string of constant keys
+        verbosity = 3 % set verbosity 0:none, 1:info, 2:debug, 3:warning
+        status = 0 % status of upload
     end
     properties (Constant)
         DEFAULT = Quantities.unitRegistry('')
     end
     methods
-        function ureg = unitRegistry(unitsfile)
+        function ureg = unitRegistry(xmlfile,verbosity)
             pi_const = Quantities.constant('pi',Quantities.quantity(pi));
-            L = Quantities.dimension('length');
-            T = Quantities.dimension('time');
-            M = Quantities.dimension('mass');
-            a = Quantities.dimension('acceleration',L./T.^2);
-            F = Quantities.dimension('force',M.*a);
-            kilo = Quantities.prefix('kilo',1000,{'k'});
-            deci = Quantities.prefix('deci',0.1,{'d'});
-            deca = Quantities.prefix('deca',1000,{'da'});
-            meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
-            inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
-            second = Quantities.unit('second',T,1,{'s','seconds'});
-            gram = Quantities.unit('gram',M,1,{'g','grams'});
-            newton = Quantities.unit('Newton',F,kilo*gram.*meter./second.^2,...
-                {'N','newtons'});
-            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
-                'meter','inch','second','gram','length','time','mass',...
-                'acceleration','force','newton','kilo','deci','deca','pi'},...
-                {Quantities.unit.DIMENSIONLESS,meter,inch,second,gram,...
-                L,T,M,a,F,newton,kilo,deci,deca,pi_const});
-            ureg.prefixes = {'kilo','deci','deca'};
-            ureg.constants = {'pi'};
-            ureg.dimensions = {'length','time','mass','acceleration','force'};
-            ureg.units = {'meter','inch','second','gram','newton'};
-%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name},...
-%                 {Quantities.unit.DIMENSIONLESS});
+%             L = Quantities.dimension('length');
+%             T = Quantities.dimension('time');
+%             M = Quantities.dimension('mass');
+%             a = Quantities.dimension('acceleration',L./T.^2);
+%             F = Quantities.dimension('force',M.*a);
+%             kilo = Quantities.prefix('kilo',1000,{'k'});
+%             deci = Quantities.prefix('deci',0.1,{'d'});
+%             deca = Quantities.prefix('deca',1000,{'da'});
+%             meter = Quantities.unit('meter',L,1,{'meters','metre','metres','m'});
+%             inch = Quantities.unit('inch',L,0.0254.*meter,{'in','inches'});
+%             second = Quantities.unit('second',T,1,{'s','seconds'});
+%             gram = Quantities.unit('gram',M,1,{'g','grams'});
+%             newton = Quantities.unit('Newton',F,kilo*gram.*meter./second.^2,...
+%                 {'N','newtons'});
+%             ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,...
+%                 'meter','inch','second','gram','length','time','mass',...
+%                 'acceleration','force','newton','kilo','deci','deca','pi'},...
+%                 {Quantities.unit.DIMENSIONLESS,meter,inch,second,gram,...
+%                 L,T,M,a,F,newton,kilo,deci,deca,pi_const});
+%             ureg.prefixes = {'kilo','deci','deca'};
+%             ureg.constants = {'pi'};
+%             ureg.dimensions = {'length','time','mass','acceleration','force'};
+%             ureg.units = {'meter','inch','second','gram','newton'};
+            ureg = ureg@containers.Map({Quantities.unit.DIMENSIONLESS.name,'pi'},...
+                {Quantities.unit.DIMENSIONLESS,pi_const});
             if nargin>0
-                ureg.unitsfile = unitsfile;
+                ureg.xmlfile = xmlfile;
             end
-            if exist(ureg.unitsfile,'file')==0
+            if exist(ureg.xmlfile,'file')==0
                 return
             end
-            xdoc = xmlread(ureg.unitsfile);
+            if nargin>1
+                ureg.verbosity = verbosity;
+            end
+            xdoc = xmlread(ureg.xmlfile);
             xroot = xdoc.getDocumentElement;
-            % prefixes
+            % number of values in xmlfile
             xprefixes = xroot.getElementsByTagName('prefix');
-            attrs = struct('name',{'name','value'},'default',{'',1},...
-                'hook',{@char,@ureg.get_value});
-            for idx = 0:xprefixes.getLength-1
-                xprefix = xprefixes.item(idx);
-                retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
-                aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
-                pre = Quantities.prefix(retv{:},aliases);
-                subsasgn(ureg,substruct('()',{pre.name}),pre);
-                ureg.prefixes{idx+1} = pre.name;
-            end
-            % dimensions
+            nxml_prefixes = xprefixes.getLength;
             xdims = xroot.getElementsByTagName('dimension');
-            % uses same attributes from prefixes
-            for idx = 0:xdims.getLength-1
-                xdim = xdims.item(idx);
-                retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
-                dim = Quantities.dimension(retv{:});
-                subsasgn(ureg,substruct('()',{dim.name}),dim);
-                ureg.dimensions{idx+1} = dim.name;
-            end
-            % constants
+            nxml_dims = xdims.getLength;
             xconsts = xroot.getElementsByTagName('constant');
-            % uses same attributes from prefixes
-            for idx = 0:xconsts.getLength-1
-                xconst = xconsts.item(idx);
-                retv = Quantities.unitRegistry.reg_parser(xconst,attrs);
-                aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
-                const = Quantities.constant(retv{:},aliases);
-                subsasgn(ureg,substruct('()',{const.name}),const);
-                ureg.constants{idx+1} = const.name;
-            end
-            % units
+            nxml_consts = xconsts.getLength;
             xunits = xroot.getElementsByTagName('unit');
-            attrs = struct('name',{'name','dimensionality','value'},...
-                'default',{'',[],1},...
-                'hook',{@char,@ureg.get_value,@ureg.get_value});
-            for idx = 0:xunits.getLength-1
-                xunit = xunits.item(idx);
-                retv = Quantities.unitRegistry.reg_parser(xunit,attrs);
-                aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
-                unit = Quantities.unit(retv{:},aliases);
-                subsasgn(ureg,substruct('()',{unit.name}),unit);
-                ureg.units{idx+1} = unit.name; % add name to units cellstring
+            nxml_units = xunits.getLength;
+            nxml = nxml_prefixes+nxml_dims+nxml_consts+nxml_units;
+            lastcount = -1;
+            nreg = 0;
+            while nreg<nxml && lastcount~=nreg
+                % number of values in registry
+                nreg_prefixes = numel(ureg.prefixes);
+                nreg_dims = numel(ureg.dimensions);
+                nreg_consts = numel(ureg.constants);
+                nreg_units = numel(ureg.units);
+                lastcount = nreg;
+                nreg = nreg_prefixes+nreg_dims+nreg_consts+nreg_units;
+                % prefixes
+                attrs = struct('name',{'name','value'},'default',{'',1},...
+                    'hook',{@char,@ureg.get_value});
+                for idx = nreg_prefixes:nxml_prefixes-1
+                    xprefix = xprefixes.item(idx);
+                    retv = Quantities.unitRegistry.reg_parser(xprefix,attrs);
+                    if ureg.status<0
+                        continue
+                    end
+                    aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
+                    pre = Quantities.prefix(retv{:},aliases);
+                    subsasgn(ureg,substruct('()',{pre.name}),pre);
+                    ureg.prefixes{idx+1} = pre.name;
+                    ureg.logging('debug','loading prefix: %s',pre.name)
+                end
+                % dimensions
+                % uses same attributes from prefixes
+                for idx = nreg_dims:nxml_dims-1
+                    xdim = xdims.item(idx);
+                    retv = Quantities.unitRegistry.reg_parser(xdim,attrs);
+                    if ureg.status<0
+                        continue
+                    end
+                    dim = Quantities.dimension(retv{:});
+                    subsasgn(ureg,substruct('()',{dim.name}),dim);
+                    ureg.dimensions{idx+1} = dim.name;
+                    ureg.logging('debug','loading dimension: %s',dim.name)
+                end
+                % constants
+                % uses same attributes from prefixes
+                for idx = nreg_consts:nxml_consts-1
+                    xconst = xconsts.item(idx);
+                    retv = Quantities.unitRegistry.reg_parser(xconst,attrs);
+                    if ureg.status<0
+                        continue
+                    end
+                    aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
+                    const = Quantities.constant(retv{:},aliases);
+                    subsasgn(ureg,substruct('()',{const.name}),const);
+                    ureg.constants{idx+1} = const.name;
+                    ureg.logging('debug','loading constant: %s',const.name)
+                end
+                % units
+                attrs = struct('name',{'name','dimensionality','value'},...
+                    'default',{'',[],1},...
+                    'hook',{@char,@ureg.get_value,@ureg.get_value});
+                for idx = nreg_units:nxml_units-1
+                    xunit = xunits.item(idx);
+                    retv = Quantities.unitRegistry.reg_parser(xunit,attrs);
+                    if ureg.status<0
+                        continue
+                    end
+                    aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
+                    unit = Quantities.unit(retv{:},aliases);
+                    subsasgn(ureg,substruct('()',{unit.name}),unit);
+                    ureg.units{idx+1} = unit.name; % add name to units cellstring
+                    ureg.logging('debug','loading unit: %s',unit.name)
+                end
             end
         end
         function F = subsref(ureg,s)
@@ -190,11 +228,22 @@ classdef unitRegistry < containers.Map
                         if ~strcmp(ME.identifier,'MATLAB:Containers:Map:NoKey')
                             rethrow(ME)
                         end
-                        error('unitRegistry:value',...
-                            'Value refers to key that could not be found.')
+                            ureg.status = -1; % key could not be found
+                            return
+%                         error('unitRegistry:value',...
+%                             'Value refers to key that could not be found.')
                     end
                 end
+                ureg.status = 0; % success
                 value = value.*val.^d(idx);
+            end
+        end
+        function logging(ureg,level,msg,varargin)
+            levels = {'info','debug','warning'};
+            level = validatestring(level,levels,'logging','level',2);
+            level = strcmp(level,{'info','debug','warning'})*(1:numel(levels))';
+            if ureg.verbosity>=level
+                fprintf([msg,'\n'],varargin{:});
             end
         end
     end
