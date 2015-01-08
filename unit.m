@@ -12,7 +12,25 @@ classdef unit < double
         DIMENSIONLESS = Quantities.unit % dimensionless unit
     end
     methods
-        function u = unit(name,dimensionality,value,aliases)
+        function u = unit(name,varargin)
+            p = inputParser;
+            % name must be a string
+            p.addRequired('name',@(name)validateattributes(name,...
+                {'char'},{'row'},'unit','name',1))
+            % dimensionality must be null or dimensionality class
+            function validate_dimensionality(dim)
+                if ~isempty(dim)
+                    validateattributes(dim,...
+                        {'Quantities.dimension'},{'scalar'},'unit',...
+                        'dimensionality',2)
+                end
+            end
+            p.addOptional('dimensionality',[],@(dim)validate_dimensionality(dim))
+            p.addOptional('value')
+            p.addOptional('aliases')
+            p.addOptional('offset')
+            p.parse(name,varargin{:})
+            args = p.Results;
             % default value for no-arg constructor
             if nargin<1
                 value = 1;
@@ -24,16 +42,8 @@ classdef unit < double
             u = u@double(value); % required for subclass of double
             % parse arguments
             if nargin>0
-                % name must be a string
-                validateattributes(name,{'char'},{'row'},'unit','name',1)
-                u.name = name;
-                % dimensionality must be null or dimensionality class
-                if ~isempty(dimensionality)
-                    validateattributes(dimensionality,...
-                        {'Quantities.dimension'},{'scalar'},'unit',...
-                        'dimensionality',2)
-                    u.dimensionality = dimensionality;
-                end
+                u.name = args.name;
+                u.dimensionality = args.dimensionality;
                 % value must equal 1 if not a quantity class
                 if isa(value,'Quantities.unit')
                     value = Quantities.quantity.as_quantity(value);

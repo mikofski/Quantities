@@ -1,18 +1,71 @@
-<unit name="dram = oz / 16 = dr = avoirdupois_dram
-<unit name="ounce = 28.349523125 * gram = oz = avoirdupois_ounce
-<unit name="pound = 0.45359237 * kilogram = lb = avoirdupois_pound
-<unit name="stone = 14 * lb = st
-<unit name="carat = 200 * milligram
-<unit name="grain = 64.79891 * milligram = gr
-<unit name="long_hundredweight = 112 * lb
-<unit name="short_hundredweight = 100 * lb
-<unit name="metric_ton = 1000 * kilogram = t = tonne
-<unit name="pennyweight = 24 * gram = dwt
-<unit name="slug = 14.59390 * kilogram
-<unit name="troy_ounce = 480 * gram = toz = apounce = apothecary_ounce
-<unit name="troy_pound = 12 * toz = tlb = appound = apothecary_pound
-<unit name="drachm = 60 * gram = apdram = apothecary_dram
-<unit name="atomic_mass_unit = 1.660538782e-27 * kilogram =  u = amu = dalton = Da
-<unit name="scruple = 20 * gram
-<unit name="bag = 94 * lb
-<unit name="ton = 2000 * lb = short_ton
+<unit name="dram" value="oz/16">
+  <alias>dr</alias>
+  <alias>avoirdupois_dram</alias>
+</unit>
+
+<unit name="ounce" value="28.349523125*gram">
+  <alias>oz</alias>
+  <alias>avoirdupois_ounce</alias>
+</unit>
+
+<unit name="pound" value="0.45359237*kilogram">
+  <alias>lb</alias>
+  <alias>avoirdupois_pound</alias>
+</unit>
+
+<unit name="stone" value="14*lb">
+  <alias>st</alias>
+</unit>
+
+<unit name="carat" value="200*milligram"/>
+
+<unit name="grain" value="64.79891*milligram">
+  <alias>gr</alias>
+</unit>
+
+<unit name="long_hundredweight" value="112*lb"/>
+
+<unit name="short_hundredweight" value="100*lb"/>
+
+<unit name="metric_ton" value="1000*kilogram">
+  <alias>t</alias>
+  <alias>tonne</alias>
+</unit>
+
+<unit name="pennyweight" value="24*gram">
+  <alias>dwt</alias>
+</unit>
+
+<unit name="slug" value="14.59390*kilogram"/>
+
+<unit name="troy_ounce" value="480*gram">
+  <alias>toz</alias>
+  <alias>apounce</alias>
+  <alias>apothecary_ounce</alias>
+</unit>
+
+<unit name="troy_pound" value="12*toz">
+  <alias>tlb</alias>
+  <alias>appound</alias>
+  <alias>apothecary_pound</alias>
+</unit>
+
+<unit name="drachm" value="60*gram">
+  <alias>apdram</alias>
+  <alias>apothecary_dram</alias>
+</unit>
+
+<unit name="atomic_mass_unit" value="1.660538782e-27*kilogram">
+  <alias>u</alias>
+  <alias>amu</alias>
+  <alias>dalton</alias>
+  <alias>Da</alias>
+</unit>
+
+<unit name="scruple" value="20*gram"/>
+
+<unit name="bag" value="94*lb"/>
+
+<unit name="ton" value="2000*lb">
+  <alias>short_ton</alias>
+</unit>

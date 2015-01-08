@@ -8,25 +8,28 @@ classdef quantity < double
     end
     methods
         function x = quantity(average,varargin)
+            % parse inputs
             p = inputParser;
             p.addRequired('average',...
-                @(arg)validateattributes(arg,{'numeric'},{'real','finite'},...
-                'quantity','average'));
+                @(average)validateattributes(average,{'numeric'},...
+                {'real','finite'},'quantity','average'));
             p.addOptional('stdev',zeros(size(average)),...
-                @(arg)validateattributes(arg,{'numeric'},...
+                @(stdev)validateattributes(stdev,{'numeric'},...
                 {'real','finite','size',size(average),'nonnegative'},...
                 'quantity','stdev'))
             p.addOptional('units',Quantities.unit.DIMENSIONLESS,...
-                @(arg)validateattributes(arg,{'Quantities.unit'},{'scalar'},...
+                @(units)validateattributes(units,{'Quantities.unit'},{'scalar'},...
                 'quantity','units'))
             p.addParameter('variance',zeros(size(average)),...
-                @(arg)validateattributes(arg,{'numeric'},...
+                @(variance)validateattributes(variance,{'numeric'},...
                 {'real','finite','size',size(average),'nonnegative'},...
                 'quantity','variance'))
             p.parse(average,varargin{:});
             args = p.Results;
+            % superclass constructor
             x = x@double(args.average); % required for subclass of double
-            x.average = double(x);
+            x.average = double(x); % coerce quantity to double
+            % calculate variance or standard deviation, depending on args
             if any(strcmp('variance',p.UsingDefaults))
                 x.stdev = double(args.stdev); % cast numeric as double
                 x.variance = x.stdev.^2;
@@ -34,8 +37,9 @@ classdef quantity < double
                 x.variance = double(args.variance); % cast numeric as double
                 x.stdev = sqrt(x.variance);
             end
+            % calculate standard deviation relative to average
             x.relative = x.stdev./x.average;
-            x.units = args.units;
+            x.units = args.units; % assign units
         end
         function F = char(x)
             if ismatrix(x)
@@ -205,17 +209,20 @@ classdef quantity < double
                 (log(x.average).*x.average.^y.average).^2.*y.variance);
         end
         function F = mpower(x,y)
-            if isscalar(y)
+            % MPOWER Matrix power.
+            % If X and Y are scalar then returns POWER(X,Y). If Y is a
+            % scalar non-negative integer then repeated matrix
+            % multiplication is used. Otherwise QUANTITY is coerced to
+            % DOUBLE.
+            if isscalar(x) && isscalar(y)
+                F = x.^y;
+            elseif isscalar(y) && isinteger(y) && y>=0
                 F = 1;
-                if x==0
+                if y==0
                     return
                 end
-                for n = 1:abs(x)
-                    if x>0
-                        F = F*x;
-                    else
-                        F = F/x;
-                    end
+                for n = 1:y
+                    F = F*x;
                 end
             else
                 F = mpower@double(x,y);
@@ -233,7 +240,7 @@ classdef quantity < double
         end
         function F = mrdivide(x,y)
             if isscalar(x) && isscalar(y)
-                F = x.\y;
+                F = x./y;
             else
                 F = mrdivide(x,y);
             end
@@ -250,7 +257,7 @@ classdef quantity < double
         end
         function F = mldivide(x,y)
             if isscalar(x) && isscalar(y)
-                F = x./y;
+                F = x.\y;
             else
                 F = mldivide(x,y);
             end
@@ -304,16 +311,13 @@ classdef quantity < double
                 'variance',1./(log(10)*x.average).^2.*x.variance);
         end
         function F = to_base(x)
+            % TO_BASE Convert units to base units.
             if x.units.value==1
                 F = x;
                 return
             end
             F = x.units.value.*x./x.units;
-%             F = F.combine_units;
         end
-%         function F = combine_units(x)
-%             F = Quantities.quantity(x.average,x.stdev,x.units.combine);
-%         end
     end
     methods (Static)
         function F = as_quantity(x)

@@ -1,29 +1,130 @@
-<unit name="liter = 1e-3 * m ** 3 = l = L = litre
-<unit name="cc = centimeter ** 3 = cubic_centimeter
-<unit name="stere = meter ** 3
-<unit name="gross_register_ton = 100 * foot ** 3 = register_ton = GRT
-<unit name="acre_foot = acre * foot = acre_feet
-<unit name="board_foot = foot ** 2 * inch = FBM
-<unit name="bushel = 2150.42 * inch ** 3 = bu = US_bushel
-<unit name="dry_gallon = bushel / 8 = US_dry_gallon
-<unit name="dry_quart = dry_gallon / 4 = US_dry_quart
-<unit name="dry_pint = dry_quart / 2 = US_dry_pint
-<unit name="gallon = 231 * inch ** 3 = liquid_gallon = US_liquid_gallon
-<unit name="quart = gallon / 4 = liquid_quart = US_liquid_quart
-<unit name="pint = quart / 2 = pt = liquid_pint = US_liquid_pint
-<unit name="cup = pint / 2 = liquid_cup = US_liquid_cup
-<unit name="gill = cup / 2 = liquid_gill = US_liquid_gill
-<unit name="fluid_ounce = gill / 4 = floz = US_fluid_ounce = US_liquid_ounce
-<unit name="imperial_bushel = 36.36872 * liter = UK_bushel
-<unit name="imperial_gallon = imperial_bushel / 8 = UK_gallon
-<unit name="imperial_quart = imperial_gallon / 4 = UK_quart
-<unit name="imperial_pint = imperial_quart / 2 = UK_pint
-<unit name="imperial_cup = imperial_pint / 2 = UK_cup
-<unit name="imperial_gill = imperial_cup / 2 = UK_gill
-<unit name="imperial_floz = imperial_gill / 5 = UK_fluid_ounce = imperial_fluid_ounce
-<unit name="barrel = 42 * gallon = bbl
-<unit name="tablespoon = floz / 2 = tbsp = Tbsp = Tblsp = tblsp = tbs = Tbl
-<unit name="teaspoon = tablespoon / 3 = tsp
-<unit name="peck = bushel / 4 = pk
-<unit name="fluid_dram = floz / 8 = fldr = fluidram
-<unit name="firkin = barrel / 4
+<unit name="liter" value="1e-3*m^3">
+  <alias>l</alias>
+  <alias>L</alias>
+  <alias>litre</alias>
+</unit>
+
+<unit name="cc" value="centimeter^3">
+  <alias>cubic_centimeter</alias>
+</unit>
+
+<unit name="stere" value="meter^3"/>
+
+<unit name="gross_register_ton" value="100*foot^3">
+  <alias>register_ton</alias>
+  <alias>GRT</alias>
+</unit>
+
+<unit name="acre_foot" value="acre*foot">
+  <alias>acre_feet</alias>
+</unit>
+
+<unit name="board_foot" value="foot^2*inch">
+  <alias>FBM</alias>
+</unit>
+
+<unit name="bushel" value="2150.42*inch^3">
+  <alias>bu</alias>
+  <alias>US_bushel</alias>
+</unit>
+
+<unit name="dry_gallon" value="bushel/8">
+  <alias>US_dry_gallon</alias>
+</unit>
+
+<unit name="dry_quart" value="dry_gallon/4">
+  <alias>US_dry_quart</alias>
+</unit>
+
+<unit name="dry_pint" value="dry_quart/2">
+  <alias>US_dry_pint</alias>
+</unit>
+
+<unit name="gallon" value="231*inch^3">
+  <alias>liquid_gallon</alias>
+  <alias>US_liquid_gallon</alias>
+</unit>
+
+<unit name="quart" value="gallon/4">
+  <alias>liquid_quart</alias>
+  <alias>US_liquid_quart</alias>
+</unit>
+
+<unit name="pint" value="quart/2">
+  <alias>pt</alias>
+  <alias>liquid_pint</alias>
+  <alias>US_liquid_pint</alias>
+</unit>
+
+<unit name="cup" value="pint/2">
+  <alias>liquid_cup</alias>
+  <alias>US_liquid_cup</alias>
+</unit>
+
+<unit name="gill" value="cup/2">
+  <alias>liquid_gill</alias>
+  <alias>US_liquid_gill</alias>
+</unit>
+
+<unit name="fluid_ounce" value="gill/4">
+  <alias>floz</alias>
+  <alias>US_fluid_ounce</alias>
+  <alias>US_liquid_ounce</alias>
+</unit>
+
+<unit name="imperial_bushel" value="36.36872*liter">
+  <alias>UK_bushel</alias>
+</unit>
+
+<unit name="imperial_gallon" value="imperial_bushel/8">
+  <alias>UK_gallon</alias>
+</unit>
+
+<unit name="imperial_quart" value="imperial_gallon/4">
+  <alias>UK_quart</alias>
+</unit>
+
+<unit name="imperial_pint" value="imperial_quart/2">
+  <alias>UK_pint</alias>
+</unit>
+
+<unit name="imperial_cup" value="imperial_pint/2">
+  <alias>UK_cup</alias>
+</unit>
+
+<unit name="imperial_gill" value="imperial_cup/2">
+  <alias>UK_gill</alias>
+</unit>
+
+<unit name="imperial_floz" value="imperial_gill/5">
+  <alias>UK_fluid_ounce</alias>
+  <alias>imperial_fluid_ounce</alias>
+</unit>
+
+<unit name="barrel" value="42*gallon">
+  <alias>bbl</alias>
+</unit>
+
+<unit name="tablespoon" value="floz/2">
+  <alias>tbsp</alias>
+  <alias>Tbsp</alias>
+  <alias>Tblsp</alias>
+  <alias>tblsp</alias>
+  <alias>tbs</alias>
+  <alias>Tbl</alias>
+</unit>
+
+<unit name="teaspoon" value="tablespoon/3">
+  <alias>tsp</alias>
+</unit>
+
+<unit name="peck" value="bushel/4">
+  <alias>pk</alias>
+</unit>
+
+<unit name="fluid_dram" value="floz/8">
+  <alias>fldr</alias>
+  <alias>fluidram</alias>
+</unit>
+
+<unit name="firkin" value="barrel/4"/>
