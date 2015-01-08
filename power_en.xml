@@ -1,7 +1,24 @@
-<unit name="watt = joule / second = W = volt_ampere = VA
-<unit name="horsepower = 33000 * ft * lbf / min = hp = UK_horsepower = British_horsepower
-<unit name="boiler_horsepower = 33475 * btu / hour
-<unit name="metric_horsepower =  75 * force_kilogram * meter / second
-<unit name="electric_horsepower = 746 * watt
-<unit name="hydraulic_horsepower = 550 * feet * lbf / second
-<unit name="refrigeration_ton = 12000 * btu / hour = ton_of_refrigeration
+<unit name="watt" value="joule/second">
+  <alias>W</alias>
+  <alias>volt_ampere</alias>
+  <alias>VA</alias>
+</unit>
+
+<unit name="horsepower" value="33000*ft*lbf/min">
+  <alias>hp</alias>
+  <alias>UK_horsepower</alias>
+  <alias>British_horsepower</alias>
+</unit>
+
+<unit name="boiler_horsepower" value="33475*btu/hour"/>
+
+<unit name="metric_horsepower" value=" 75*force_kilogram*meter/second"/>
+
+<unit name="electric_horsepower" value="746*watt"/>
+
+<unit name="hydraulic_horsepower" value="550*feet*lbf/second"/>
+
+<unit name="refrigeration_ton" value="12000*btu/hour">
+  <alias>ton_of_refrigeration</alias>
+</unit>
+

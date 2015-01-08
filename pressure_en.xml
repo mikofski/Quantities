@@ -1,23 +1,87 @@
-<unit name="Hg = gravity * 13.59510 * gram / centimeter ** 3 = mercury = conventional_mercury
-<unit name="mercury_60F = gravity * 13.5568 * gram / centimeter ** 3
-<unit name="H2O = gravity * 1000 * kilogram / meter ** 3 = h2o = water = conventional_water
-<unit name="water_4C = gravity * 999.972 * kilogram / meter ** 3 = water_39F
-<unit name="water_60F = gravity * 999.001 * kilogram / m ** 3
-<unit name="pascal = newton / meter ** 2 = Pa
-<unit name="bar = 100000 * pascal
-<unit name="atmosphere = 101325 * pascal = atm = standard_atmosphere
-<unit name="technical_atmosphere = kilogram * gravity / centimeter ** 2 = at
-<unit name="torr = atm / 760
-<unit name="psi = pound * gravity / inch ** 2 = pound_force_per_square_inch
-<unit name="ksi = kip / inch ** 2 = kip_per_square_inch
-<unit name="barye = 0.1 * newton / meter ** 2 = barie = barad = barrie = baryd = Ba
-<unit name="mmHg = millimeter * Hg = mm_Hg = millimeter_Hg = millimeter_Hg_0C
-<unit name="cmHg = centimeter * Hg = cm_Hg = centimeter_Hg
-<unit name="inHg = inch * Hg = in_Hg = inch_Hg = inch_Hg_32F
-<unit name="inch_Hg_60F = inch * mercury_60F
-<unit name="inch_H2O_39F = inch * water_39F
-<unit name="inch_H2O_60F = inch * water_60F
-<unit name="footH2O = ft * water
-<unit name="cmH2O = centimeter * water
-<unit name="foot_H2O = ft * water = ftH2O
-<unit name="standard_liter_per_minute = 1.68875 * Pa * m ** 3 / s = slpm = slm
+<unit name="Hg" value="gravity*13.59510*gram/centimeter^3">
+  <alias>mercury</alias>
+  <alias>conventional_mercury</alias>
+</unit>
+
+<unit name="mercury_60F" value="gravity*13.5568*gram/centimeter^3"/>
+
+<unit name="H2O" value="gravity*1000*kilogram/meter^3">
+  <alias>h2o</alias>
+  <alias>water</alias>
+  <alias>conventional_water</alias>
+</unit>
+
+<unit name="water_4C" value="gravity*999.972*kilogram/meter^3">
+  <alias>water_39F</alias>
+</unit>
+
+<unit name="water_60F" value="gravity*999.001*kilogram/m^3"/>
+
+<unit name="pascal" value="newton/meter^2">
+  <alias>Pa</alias>
+</unit>
+
+<unit name="bar" value="100000*pascal"/>
+
+<unit name="atmosphere" value="101325*pascal">
+  <alias>atm</alias>
+  <alias>standard_atmosphere</alias>
+</unit>
+
+<unit name="technical_atmosphere" value="kilogram*gravity/centimeter^2">
+  <alias>at</alias>
+</unit>
+
+<unit name="torr" value="atm/760"/>
+
+<unit name="psi" value="pound*gravity/inch^2">
+  <alias>pound_force_per_square_inch</alias>
+</unit>
+
+<unit name="ksi" value="kip/inch^2">
+  <alias>kip_per_square_inch</alias>
+</unit>
+
+<unit name="barye" value="0.1*newton/meter^2">
+  <alias>barie</alias>
+  <alias>barad</alias>
+  <alias>barrie</alias>
+  <alias>baryd</alias>
+  <alias>Ba</alias>
+</unit>
+
+<unit name="mmHg" value="millimeter*Hg">
+  <alias>mm_Hg</alias>
+  <alias>millimeter_Hg</alias>
+  <alias>millimeter_Hg_0C</alias>
+</unit>
+
+<unit name="cmHg" value="centimeter*Hg">
+  <alias>cm_Hg</alias>
+  <alias>centimeter_Hg</alias>
+</unit>
+
+<unit name="inHg" value="inch*Hg">
+  <alias>in_Hg</alias>
+  <alias>inch_Hg</alias>
+  <alias>inch_Hg_32F</alias>
+</unit>
+
+<unit name="inch_Hg_60F" value="inch*mercury_60F"/>
+
+<unit name="inch_H2O_39F" value="inch*water_39F"/>
+
+<unit name="inch_H2O_60F" value="inch*water_60F"/>
+
+<unit name="footH2O" value="ft*water"/>
+
+<unit name="cmH2O" value="centimeter*water"/>
+
+<unit name="foot_H2O" value="ft*water">
+  <alias>ftH2O</alias>
+</unit>
+
+<unit name="standard_liter_per_minute" value="1.68875*Pa*m^3/s">
+  <alias>slpm</alias>
+  <alias>slm</alias>
+</unit>
