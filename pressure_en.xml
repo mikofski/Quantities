@@ -1,0 +1,23 @@
+Hg = gravity * 13.59510 * gram / centimeter ** 3 = mercury = conventional_mercury
+mercury_60F = gravity * 13.5568 * gram / centimeter ** 3
+H2O = gravity * 1000 * kilogram / meter ** 3 = h2o = water = conventional_water
+water_4C = gravity * 999.972 * kilogram / meter ** 3 = water_39F
+water_60F = gravity * 999.001 * kilogram / m ** 3
+pascal = newton / meter ** 2 = Pa
+bar = 100000 * pascal
+atmosphere = 101325 * pascal = atm = standard_atmosphere
+technical_atmosphere = kilogram * gravity / centimeter ** 2 = at
+torr = atm / 760
+psi = pound * gravity / inch ** 2 = pound_force_per_square_inch
+ksi = kip / inch ** 2 = kip_per_square_inch
+barye = 0.1 * newton / meter ** 2 = barie = barad = barrie = baryd = Ba
+mmHg = millimeter * Hg = mm_Hg = millimeter_Hg = millimeter_Hg_0C
+cmHg = centimeter * Hg = cm_Hg = centimeter_Hg
+inHg = inch * Hg = in_Hg = inch_Hg = inch_Hg_32F
+inch_Hg_60F = inch * mercury_60F
+inch_H2O_39F = inch * water_39F
+inch_H2O_60F = inch * water_60F
+footH2O = ft * water
+cmH2O = centimeter * water
+foot_H2O = ft * water = ftH2O
+standard_liter_per_minute = 1.68875 * Pa * m ** 3 / s = slpm = slm

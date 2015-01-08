@@ -1,0 +1,56 @@
+<unit name="minute" value="60*second">
+  <alias>min</alias>
+</unit>
+
+<unit name="hour" value="60*minute"><alias>hr</alias>
+</unit>
+
+<unit name="day" value="24*hour"/>
+
+<unit name="week" value="7*day"/>
+
+<unit name="fortnight" value="2*week"/>
+
+<unit name="year" value="31556925.9747*second"/>
+
+<unit name="month" value="year/12"/>
+
+<unit name="shake" value="1e-8*second"/>
+
+<unit name="sidereal_day" value="day/1.00273790935079524"/>
+
+<unit name="sidereal_hour" value="sidereal_day/24"/>
+
+<unit name="sidereal_minute" value="sidereal_hour/60"/>
+
+<unit name="sidereal_second" value="sidereal_minute/60"/>
+
+<unit name="sidereal_year" value="366.25636042*sidereal_day"/>
+
+<unit name="sidereal_month" value="27.321661*sidereal_day"/>
+
+<unit name="tropical_month" value="27.321661*day"/>
+
+<unit name="synodic_month" value="29.530589*day">
+  <alias>lunar_month</alias>
+</unit>
+
+<unit name="common_year" value="365*day"/>
+
+<unit name="leap_year" value="366*day"/>
+
+<unit name="julian_year" value="365.25*day"/>
+
+<unit name="gregorian_year" value="365.2425*day"/>
+
+<unit name="millenium" value="1000*year">
+  <alias>millenia</alias>
+  <alias>milenia</alias>
+  <alias>milenium</alias>
+</unit>
+
+<unit name="eon" value="1e9*year"/>
+
+<unit name="work_year" value="2056*hour"/>
+
+<unit name="work_month" value="work_year/12"/>
