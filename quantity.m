@@ -204,7 +204,8 @@ classdef quantity < double
             y = Quantities.quantity.as_quantity(y);
             assert(y.units.is_dimensionless,'quantity:power',...
                 'Power must be dimensionless.')
-            F = Quantities.quantity(power@double(x,y),'units',x.units,'variance',...
+            unit = x.units^double(y); % combine units
+            F = Quantities.quantity(power@double(x,y),'units',unit,'variance',...
                 (y.average.*x.average.^(y.average-1)).^2.*x.variance+...
                 (log(x.average).*x.average.^y.average).^2.*y.variance);
         end
@@ -227,6 +228,9 @@ classdef quantity < double
             else
                 F = mpower@double(x,y);
             end
+        end
+        function F = sqrt(x)
+            F = x.^0.5;
         end
         function F = rdivide(x,y)
             % F = x./y
@@ -273,18 +277,31 @@ classdef quantity < double
         function F = sin(x)
             % F = sin(x)
             % dF^2 = (cos(x).*dx).^2
-            assert(strcmp(x.units.dimensionality,'angle'),'quantity:sin',...
-                'Sine argument must be an angle.')
-            F = Quantities.quantity(sin@double(x),'units',x.units,...
+            assert(isempty(x.units.dimensionality),'quantity:sin',...
+                'Sine argument must be a dimensionless unit, IE: radians, degrees, etc.')
+            x = x.to_base; % convert to radians
+            F = Quantities.quantity(sin@double(x),'units',...
+                Quantities.unit.DIMENSIONLESS,...
                 'variance',cos(x.average).^2.*x.variance);
         end
         function F = cos(x)
             % F = cos(x)
             % dF^2 = (-sin(x).*dx).^2
-            assert(strcmp(x.units.dimensionality,'angle'),'quantity:cos',...
-                'Cosine argument must be an angle.')
-            F = Quantities.quantity(cos@double(x),'units',x.units,...
+            assert(isempty(x.units.dimensionality),'quantity:cos',...
+                'Cosine argument must be a dimensionless unit, IE: radians, degrees, etc.')
+            x = x.to_base; % convert to radians
+            F = Quantities.quantity(cos@double(x),'units',...
+                Quantities.unit.DIMENSIONLESS,...
                 'variance',sin(x.average).^2.*x.variance); % (-1)^2 = 1
+        end
+        function F = tan(x)
+            x_sin = sin(x);
+            x_cos = cos(x);
+            x_tan = x_sin./x_cos;
+            x = x.to_base; % convert to radians
+            F = Quantities.quantity(tan@double(x),'units',...
+                Quantities.unit.DIMENSIONLESS,...
+                'variance',x_tan.variance);
         end
         function F = log(x)
             % F = log(x)
