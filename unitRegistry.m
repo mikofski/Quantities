@@ -74,7 +74,8 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    nreg_prefixes = nreg_prefixes+1;
+                    % success
+                    nreg_prefixes = nreg_prefixes+1; % increment counter
                     aliases = Quantities.unitRegistry.get_tag_text_list(xprefix,'alias');
                     pre = Quantities.prefix(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{pre.name}),pre);
@@ -99,7 +100,8 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    nreg_dims = nreg_dims+1;
+                    % success
+                    nreg_dims = nreg_dims+1; % increment counter
                     dim = Quantities.dimension(retv{:});
                     subsasgn(ureg,substruct('()',{dim.name}),dim);
                     ureg.dimensions{nreg_dims} = dim.name;
@@ -119,7 +121,8 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    nreg_consts = nreg_consts+1;
+                    % success
+                    nreg_consts = nreg_consts+1; % increment counter
                     aliases = Quantities.unitRegistry.get_tag_text_list(xconst,'alias');
                     const = Quantities.constant(retv{:},aliases);
                     subsasgn(ureg,substruct('()',{const.name}),const);
@@ -128,9 +131,10 @@ classdef unitRegistry < containers.Map
                 end
                 % units
                 ureg.status = 0; % reset status
-                attrs = struct('name',{'name','dimensionality','value'},...
-                    'default',{'',[],1},...
-                    'hook',{@char,@char,@ureg.get_value});
+                attrs = struct(...
+                    'name',{'name','dimensionality','value','offset'},...
+                    'default',{'',[],1,0},...
+                    'hook',{@char,@char,@ureg.get_value,@double});
                 for idx = 0:nxml_units-1
                     xunit = xunits.item(idx);
                     % skip if already loaded
@@ -142,7 +146,8 @@ classdef unitRegistry < containers.Map
                     if ureg.status<0
                         continue
                     end
-                    nreg_units = nreg_units+1;
+                    % success
+                    nreg_units = nreg_units+1; % increment counter
                     aliases = Quantities.unitRegistry.get_tag_text_list(xunit,'alias');
                     % derive dimensionality
                     if isa(retv{3},'Quantities.unit')

@@ -12,7 +12,7 @@ classdef unit < double
         DIMENSIONLESS = Quantities.unit % dimensionless unit
     end
     methods
-        function u = unit(name,dimensionality,value,aliases)
+        function u = unit(name,dimensionality,value,offset,aliases)
             % default value for no-arg constructor
             if nargin<1
                 value = 1;
@@ -47,9 +47,14 @@ classdef unit < double
                 % TODO: these should be unit class objects
                 [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
             end
+            % parse offset
+            if nargin>3 && ~isempty(offset)
+                validateattributes(offset,{'numeric'},{'scalar','real','finite'},'unit','offset',4)
+                u.offset = offset;
+            end
             % parse aliases
-            if nargin>3 && ~isempty(aliases)
-                validateattributes(aliases,{'cell'},{'vector'},'unit','aliases',4)
+            if nargin>4 && ~isempty(aliases)
+                validateattributes(aliases,{'cell'},{'vector'},'unit','aliases',5)
                 assert(iscellstr(aliases),'unit:aliases',...
                     'Aliases must be a cell string.')
                 u.aliases = aliases;
