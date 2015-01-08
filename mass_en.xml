@@ -1,18 +1,18 @@
-dram = oz / 16 = dr = avoirdupois_dram
-ounce = 28.349523125 * gram = oz = avoirdupois_ounce
-pound = 0.45359237 * kilogram = lb = avoirdupois_pound
-stone = 14 * lb = st
-carat = 200 * milligram
-grain = 64.79891 * milligram = gr
-long_hundredweight = 112 * lb
-short_hundredweight = 100 * lb
-metric_ton = 1000 * kilogram = t = tonne
-pennyweight = 24 * gram = dwt
-slug = 14.59390 * kilogram
-troy_ounce = 480 * gram = toz = apounce = apothecary_ounce
-troy_pound = 12 * toz = tlb = appound = apothecary_pound
-drachm = 60 * gram = apdram = apothecary_dram
-atomic_mass_unit = 1.660538782e-27 * kilogram =  u = amu = dalton = Da
-scruple = 20 * gram
-bag = 94 * lb
-ton = 2000 * lb = short_ton
+<unit name="dram = oz / 16 = dr = avoirdupois_dram
+<unit name="ounce = 28.349523125 * gram = oz = avoirdupois_ounce
+<unit name="pound = 0.45359237 * kilogram = lb = avoirdupois_pound
+<unit name="stone = 14 * lb = st
+<unit name="carat = 200 * milligram
+<unit name="grain = 64.79891 * milligram = gr
+<unit name="long_hundredweight = 112 * lb
+<unit name="short_hundredweight = 100 * lb
+<unit name="metric_ton = 1000 * kilogram = t = tonne
+<unit name="pennyweight = 24 * gram = dwt
+<unit name="slug = 14.59390 * kilogram
+<unit name="troy_ounce = 480 * gram = toz = apounce = apothecary_ounce
+<unit name="troy_pound = 12 * toz = tlb = appound = apothecary_pound
+<unit name="drachm = 60 * gram = apdram = apothecary_dram
+<unit name="atomic_mass_unit = 1.660538782e-27 * kilogram =  u = amu = dalton = Da
+<unit name="scruple = 20 * gram
+<unit name="bag = 94 * lb
+<unit name="ton = 2000 * lb = short_ton
