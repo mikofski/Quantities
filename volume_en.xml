@@ -1,0 +1,29 @@
+liter = 1e-3 * m ** 3 = l = L = litre
+cc = centimeter ** 3 = cubic_centimeter
+stere = meter ** 3
+gross_register_ton = 100 * foot ** 3 = register_ton = GRT
+acre_foot = acre * foot = acre_feet
+board_foot = foot ** 2 * inch = FBM
+bushel = 2150.42 * inch ** 3 = bu = US_bushel
+dry_gallon = bushel / 8 = US_dry_gallon
+dry_quart = dry_gallon / 4 = US_dry_quart
+dry_pint = dry_quart / 2 = US_dry_pint
+gallon = 231 * inch ** 3 = liquid_gallon = US_liquid_gallon
+quart = gallon / 4 = liquid_quart = US_liquid_quart
+pint = quart / 2 = pt = liquid_pint = US_liquid_pint
+cup = pint / 2 = liquid_cup = US_liquid_cup
+gill = cup / 2 = liquid_gill = US_liquid_gill
+fluid_ounce = gill / 4 = floz = US_fluid_ounce = US_liquid_ounce
+imperial_bushel = 36.36872 * liter = UK_bushel
+imperial_gallon = imperial_bushel / 8 = UK_gallon
+imperial_quart = imperial_gallon / 4 = UK_quart
+imperial_pint = imperial_quart / 2 = UK_pint
+imperial_cup = imperial_pint / 2 = UK_cup
+imperial_gill = imperial_cup / 2 = UK_gill
+imperial_floz = imperial_gill / 5 = UK_fluid_ounce = imperial_fluid_ounce
+barrel = 42 * gallon = bbl
+tablespoon = floz / 2 = tbsp = Tbsp = Tblsp = tblsp = tbs = Tbl
+teaspoon = tablespoon / 3 = tsp
+peck = bushel / 4 = pk
+fluid_dram = floz / 8 = fldr = fluidram
+firkin = barrel / 4

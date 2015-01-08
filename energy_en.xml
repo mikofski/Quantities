@@ -1,11 +1,43 @@
-joule = newton * meter = J
-erg = dyne * centimeter
-btu = 1.05505585262e3 * joule = Btu = BTU = british_thermal_unit
-eV = 1.60217653e-19 * J = electron_volt
-thm = 100000 * BTU = therm = EC_therm
-cal = 4.184 * joule = calorie = thermochemical_calorie
-international_steam_table_calorie = 4.1868 * joule
-ton_TNT = 4.184e9 * joule = tTNT
-US_therm = 1.054804e8 * joule
-watt_hour = watt * hour = Wh = watthour
-E_h = 4.35974394e-18 * joule = hartree = hartree_energy
+<unit name="joule" value="newton*meter">
+  <alias>J</alias>
+</unit>
+
+<unit name="erg" value="dyne*centimeter"/>
+
+<unit name="btu" value="1.05505585262e3*joule">
+  <alias>Btu</alias>
+  <alias>BTU</alias>
+  <alias>british_thermal_unit</alias>
+</unit>
+
+<unit name="eV" value="1.60217653e-19*J">
+  <alias>electron_volt</alias>
+</unit>
+
+<unit name="thm" value="100000*BTU">
+  <alias>therm</alias>
+  <alias>EC_therm</alias>
+</unit>
+
+<unit name="cal" value="4.184*joule">
+  <alias>calorie</alias>
+  <alias>thermochemical_calorie</alias>
+</unit>
+
+<unit name="international_steam_table_calorie" value="4.1868*joule"/>
+
+<unit name="ton_TNT" value="4.184e9*joule">
+  <alias>tTNT</alias>
+</unit>
+
+<unit name="US_therm" value="1.054804e8*joule"/>
+
+<unit name="watt_hour" value="watt*hour">
+  <alias>Wh</alias>
+  <alias>watthour</alias>
+</unit>
+
+<unit name="E_h" value="4.35974394e-18*joule">
+  <alias>hartree</alias>
+  <alias>hartree_energy</alias>
+</unit>

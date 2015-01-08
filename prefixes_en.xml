@@ -1,62 +1,88 @@
 <!-- decimal prefixes -->
 <prefix name="yocto" value="1e-24">
-<alias>y</alias>
+  <alias>y</alias>
 </prefix>
 <prefix name="zepto" value="1e-21">
-<alias>z</alias>
+  <alias>z</alias>
 </prefix>
 <prefix name="atto" value="1e-18">
-<alias>a</alias>
+  <alias>a</alias>
 </prefix>
 <prefix name="femto" value="1e-15">
-<alias>f</alias>
+  <alias>f</alias>
 </prefix>
 <prefix name="pico" value="1e-12">
-<alias>p</alias>
+  <alias>p</alias>
 </prefix>
 <prefix name="nano" value="1e-9">
-<alias>n</alias>
+  <alias>n</alias>
 </prefix>
 <prefix name="micro" value="1e-6">
-<alias>u</alias>
-<alias>µ</alias>
+  <alias>u</alias>
+  <alias>µ</alias>
 </prefix>
 <prefix name="milli" value="1e-3">
-<alias>m</alias>
+  <alias>m</alias>
 </prefix>
 <prefix name="centi" value="1e-2">
-<alias>c</alias>
+  <alias>c</alias>
 </prefix>
 <prefix name="deci" value="1e-1">
-<alias>d</alias>
+  <alias>d</alias>
 </prefix>
 <prefix name="deca" value="1e+1">
-<alias>da</alias>
+  <alias>da</alias>
 </prefix>
 <prefix name="hecto" value="1e2">
-<alias>h</alias>
+  <alias>h</alias>
 </prefix>
 <prefix name="kilo" value="1e3">
-<alias>k</alias>
+  <alias>k</alias>
 </prefix>
 <prefix name="mega" value="1e6">
-<alias>M</alias>
+  <alias>M</alias>
 </prefix>
 <prefix name="giga" value="1e9">
-<alias>G</alias>
+  <alias>G</alias>
 </prefix>
 <prefix name="tera" value="1e12">
-<alias>T</alias>
+  <alias>T</alias>
 </prefix>
 <prefix name="peta" value="1e15">
-<alias>P</alias>
+  <alias>P</alias>
 </prefix>
 <prefix name="exa" value="1e18">
-<alias>E</alias>
+  <alias>E</alias>
 </prefix>
 <prefix name="zetta" value="1e21">
-<alias>Z</alias>
+  <alias>Z</alias>
 </prefix>
 <prefix name="yotta" value="1e24">
-<alias>Y</alias>
+  <alias>Y</alias>
+</prefix>
+
+<!-- binary_prefixes -->
+<prefix name="kibi" value="2^10">
+  <alias>Ki</alias>
+</prefix>
+<prefix name="mebi" value="2^20">
+  <alias>Mi</alias>
+</prefix>
+<prefix name="gibi" value="2^30">
+  <alias>Gi</alias>
+</prefix>
+<prefix name="tebi" value="2^40">
+  <alias>Ti</alias>
+</prefix>
+<prefix name="pebi" value="2^50">
+  <alias>Pi</alias>
+</prefix>
+<prefix name="exbi" value="2^60">
+  <alias>Ei</alias>
+</prefix>
+<prefix name="zebi" value="2^70">
+  <alias>Zi</alias>
+</prefix>
+<prefix name="yobi" value="2^80">
+  <alias>Yi</alias>
 </prefix>

@@ -1,0 +1,12 @@
+<unit name="hertz" value="1/second">
+  <alias>Hz</alias>
+  <alias>rps</alias>
+</unit>
+
+<unit name="revolutions_per_minute" value="revolution/minute">
+  <alias>rpm</alias>
+</unit>
+
+<unit name="counts_per_second" value="count/second">
+  <alias>cps</alias>
+</unit>

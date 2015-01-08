@@ -1,9 +1,38 @@
-newton = kilogram * meter / second ** 2 = N
-dyne = gram * centimeter / second ** 2 = dyn
-force_kilogram = g_0 * kilogram = kgf = kilogram_force = pond
-force_gram = g_0 * gram = gf = gram_force
-force_ounce = g_0 * ounce = ozf = ounce_force
-force_pound = g_0 * lb = lbf = pound_force
-force_ton = 2000 * force_pound = ton_force
-poundal = lb * feet / second ** 2 = pdl
-kip = 1000*lbf
+<unit name="newton" value="kilogram*meter/second^2">
+  <alias>N</alias>
+</unit>
+
+<unit name="dyne" value="gram*centimeter/second^2">
+  <alias>dyn</alias>
+</unit>
+
+<unit name="force_kilogram" value="g_0*kilogram">
+  <alias>kgf</alias>
+  <alias>kilogram_force</alias>
+  <alias>pond</alias>
+</unit>
+
+<unit name="force_gram" value="g_0*gram">
+  <alias>gf</alias>
+  <alias>gram_force</alias>
+</unit>
+
+<unit name="force_ounce" value="g_0*ounce">
+  <alias>ozf</alias>
+  <alias>ounce_force</alias>
+</unit>
+
+<unit name="force_pound" value="g_0*lb">
+  <alias>lbf</alias>
+  <alias>pound_force</alias>
+</unit>
+
+<unit name="force_ton" value="2000*force_pound">
+  <alias>ton_force</alias>
+</unit>
+
+<unit name="poundal" value="lb*feet/second^2">
+  <alias>pdl</alias>
+</unit>
+
+<unit name="kip" value="1000*lbf"/>
