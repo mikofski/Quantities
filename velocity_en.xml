@@ -1,0 +1,14 @@
+<unit name="knot" value="nautical_mile/hour">
+  <alias>kt</alias>
+  <alias>knot_international</alias>
+  <alias>international_knot</alias>
+  <alias>nautical_miles_per_hour</alias>
+</unit>
+
+<unit name="mph" value="mile/hour">
+  <alias>MPH</alias>
+</unit>
+
+<unit name="kph" value="kilometer/hour">
+  <alias>KPH</alias>
+</unit>

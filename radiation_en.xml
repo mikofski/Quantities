@@ -1,0 +1,8 @@
+# 
+Bq = Hz = becquerel
+curie = 3.7e10 * Bq = Ci
+rutherford = 1e6*Bq = rd = Rd
+Gy = joule / kilogram = gray = Sv = sievert
+rem = 1e-2 * sievert
+rads = 1e-2 * gray
+roentgen = 2.58e-4 * coulomb / kilogram

@@ -48,9 +48,10 @@ classdef unit < double
                 [u.bases,u.degrees] = Quantities.unit.parse_name(u.name);
             end
             % parse offset
-            if nargin>3 && ~isempty(offset)
-                validateattributes(offset,{'numeric'},{'scalar','real','finite'},'unit','offset',4)
-                u.offset = offset;
+            if nargin>3 && ~isempty(offset) && offset~=0
+                validateattributes(offset,{'numeric'},...
+                    {'scalar','real','finite'},'unit','offset',4)
+                u.offset = Quantities.quantity(offset,'unit',u.value.units);
             end
             % parse aliases
             if nargin>4 && ~isempty(aliases)
@@ -63,17 +64,22 @@ classdef unit < double
         function disp(u)
             F = sprintf('\t%s [%s] =\n',u.name,char(u.dimensionality));
             if isa(u.value,'Quantities.quantity')
-                H = sprintf('%s',char(u.value));
+                G = sprintf('%s',char(u.value));
             else
-                H = sprintf('\t%g [%s]\n',u.value,u.name);
+                G = sprintf('\t%g [%s]\n',u.value,u.name);
+            end
+            if u.offset~=0
+                H = sprintf('%s',char(u.offset));
+            else
+                H = '';
             end
             if ~isempty(u.aliases)
-                G = sprintf(['\t(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
+                I = sprintf(['\t(%s',repmat(', %s',[1,numel(u.aliases)-1]),')\n'],...
                     u.aliases{:});
             else
-                G = '';
+                I = '';
             end
-            fprintf('%s%s%s',F,H,G)
+            fprintf('%s%s%s%s',F,G,H,I)
         end
         % no subsref or subsasgn
         function F = subsref(u,s)
@@ -128,51 +134,13 @@ classdef unit < double
             end
         end
         function F = uplus(u)
-            F = u;
+            F = 1.*u;
         end
         function F = uminus(u)
             F = -1.*u;
         end
         function F = plus(u,v)
-            if ~isa(v,'Quantities.unit') && u.is_dimensionless &&...
-                    ~isa(v,'Quantities.quantity')
-                % u is dimensionless, v is double
-                F = Quantities.quantity(1+v,0,Quantities.unit.DIMENSIONLESS);
-            elseif ~isa(u,'Quantities.unit') && v.is_dimensionless &&...
-                    ~isa(u,'Quantities.quantity')
-                % v is dimensionless, u is double
-                F = Quantities.quantity(1+u,0,Quantities.unit.DIMENSIONLESS);
-            elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
-                % both units
-                if u==v
-                    F = Quantities.quantity(2,0,u);
-                elseif u>v
-                    if u.value~=1 && v.value~=1
-                        F = u.value + v.value;
-                    elseif u.value==1
-                        F = v.value+u;
-                    else
-                        F = u.value+v;
-                    end
-                else
-                    error('unit:incompatibleUnits',...
-                        'Units must have same dimensionality for addition.')
-                end
-            else
-                % u is a unit and v is a quantity
-                if u==v.units
-                    F = v+u;
-                elseif u>v.units
-                    if u.value==1
-                        F = v.to_base+u;
-                    else
-                        F = v.to_base+u.value;
-                    end
-                else
-                    error('unit:incompatibleUnits',...
-                        'Units must have same dimensionality for addition.')
-                end
-            end
+            F = 1.*u+1.*v;
         end
         function F = minus(u,v)
             F = u+(-v);
@@ -182,13 +150,13 @@ classdef unit < double
             if ~isa(v,'Quantities.unit') && ~isa(v,'Quantities.quantity')
                 % v is double
                 if v==1
-                    F = u; % identity
+                    F = Quantities.quantity.as_quantity(u); % coerce to quantity
                 else
                     F = Quantities.quantity(v,zeros(size(v)),u);
                 end
             elseif ~isa(u,'Quantities.unit') && ~isa(u,'Quantities.quantity')
                 % u is double
-                F = v.*u; % call times() recursively
+                F = v.*u; % commute arguments
             elseif isa(u,'Quantities.unit') && isa(v,'Quantities.unit')
                 % both u & v are units
                 if u.is_dimensionless && ~v.is_dimensionless

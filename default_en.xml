@@ -9,12 +9,16 @@
 <!ENTITY area SYSTEM "area_en.xml">
 <!ENTITY volume SYSTEM "volume_en.xml">
 <!ENTITY mass SYSTEM "mass_en.xml">
+<!ENTITY temperature SYSTEM "temperature_en.xml">
+<!ENTITY angle SYSTEM "angle_en.xml">
+<!ENTITY velocity SYSTEM "velocity_en.xml">
 <!ENTITY force SYSTEM "force_en.xml">
 <!ENTITY pressure SYSTEM "pressure_en.xml">
 <!ENTITY energy SYSTEM "energy_en.xml">
 <!ENTITY power SYSTEM "power_en.xml">
-<!ENTITY angle SYSTEM "angle_en.xml">
+<!ENTITY viscosity SYSTEM "viscosity_en.xml">
 <!ENTITY EM SYSTEM "EM_en.xml">
+<!ENTITY radiation SYSTEM "radiation_en.xml">
 <!ENTITY frequency SYSTEM "frequency_en.xml">
 ]>
 
@@ -86,6 +90,15 @@
   <!-- Mass -->
   &mass;
 
+  <!-- Temperature -->
+  &temperature;
+
+  <!-- Angle -->
+  &angle;
+
+  <!-- Velocity -->
+  &velocity;
+
   <!-- Force -->
   &force;
 
@@ -98,14 +111,17 @@
   <!-- Power -->
   &power;
 
-  <!-- Angle -->
-  &angle;
-
   <!-- Frequency -->
   &frequency;
 
+  <!-- Viscosity -->
+  &viscosity;
+
   <!-- EM -->
   &EM;
+
+  <!-- Radiation -->
+  &radiation;
 
   <!-- Heat -->
   <!-- <unit name="RSI" value="degK*meter^2/watt"/> -->
@@ -122,31 +138,3 @@ baud = bit / second = Bd = bps
 denier =  gram / (9000 * meter)
 tex = gram/ (1000 * meter)
 dtex = decitex
-
-# Radiation
-Bq = Hz = becquerel
-curie = 3.7e10 * Bq = Ci
-rutherford = 1e6*Bq = rd = Rd
-Gy = joule / kilogram = gray = Sv = sievert
-rem = 1e-2 * sievert
-rads = 1e-2 * gray
-roentgen = 2.58e-4 * coulomb / kilogram
-
-# Temperature
-degC = kelvin; offset: 273.15 = celsius
-degR = 5 / 9 * kelvin; offset: 0 = rankine
-degF = 5 / 9 * kelvin; offset: 255.372222 = fahrenheit
-
-# Time
-
-# Velocity
-[speed] = [length] / [time]
-knot = nautical_mile / hour = kt = knot_international = international_knot = nautical_miles_per_hour
-mph = mile / hour = MPH
-kph = kilometer / hour = KPH
-
-# Viscosity
-[viscosity] = [pressure] * [time]
-poise = 1e-1 * Pa * second = P
-stokes = 1e-4 * meter ** 2 / second = St
-rhe = 10 / (Pa * s)

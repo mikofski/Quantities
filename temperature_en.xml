@@ -1,0 +1,11 @@
+<unit name="degC" value="kelvin" offset="273.15">
+  <alias>celsius</alias>
+</unit>
+
+<unit name="degR" value="5/9*kelvin" offset="0">
+  <alias>rankine</alias>
+</unit>
+
+<unit name="degF" value="5/9*kelvin" offset="255.372222">
+  <alias>fahrenheit</alias>
+</unit>

@@ -12,17 +12,17 @@ classdef quantity < double
             p = inputParser;
             p.addRequired('average',...
                 @(average)validateattributes(average,{'numeric'},...
-                {'real','finite'},'quantity','average'));
+                {'real'},'quantity','average'));
             p.addOptional('stdev',zeros(size(average)),...
                 @(stdev)validateattributes(stdev,{'numeric'},...
-                {'real','finite','size',size(average),'nonnegative'},...
+                {'real','size',size(average),'nonnegative'},...
                 'quantity','stdev'))
             p.addOptional('units',Quantities.unit.DIMENSIONLESS,...
                 @(units)validateattributes(units,{'Quantities.unit'},{'scalar'},...
                 'quantity','units'))
             p.addParameter('variance',zeros(size(average)),...
                 @(variance)validateattributes(variance,{'numeric'},...
-                {'real','finite','size',size(average),'nonnegative'},...
+                {'real','size',size(average),'nonnegative'},...
                 'quantity','variance'))
             p.parse(average,varargin{:});
             args = p.Results;
@@ -158,6 +158,10 @@ classdef quantity < double
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
             x = x.to_base;y = y.to_base;
+            if x~=0 && y~=0
+                assert(x.units==y.units,'quantity:plus',...
+                    'Quantity must have same units for addition.');
+            end
             F = Quantities.quantity(plus@double(x,y),'units',x.units,...
                 'variance',x.variance+y.variance);
         end
@@ -167,6 +171,10 @@ classdef quantity < double
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
             x = x.to_base;y = y.to_base;
+            if x~=0 && y~=0
+                assert(x.units==y.units,'quantity:plus',...
+                    'Quantity must have same units for subtraction.');
+            end
             F = Quantities.quantity(minus@double(x,y),'units',x.units,...
                 'variance',x.variance+y.variance); % (-1)^2 = 1
         end
@@ -175,6 +183,7 @@ classdef quantity < double
             % dF^2 = (y.*dx).^2+(x.*dy).^2
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
+            x = x.to_base;y = y.to_base;
             unit = x.units.*y.units; % combine units
             F = Quantities.quantity(times@double(x,y),'units',unit,'variance',...
                 y.average.^2.*x.variance+x.average.^2.*y.variance);
@@ -193,6 +202,7 @@ classdef quantity < double
             end
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
+            x = x.to_base;y = y.to_base;
             unit = x.units*y.units; % combine units
             F = Quantities.quantity(mtimes@double(x,y),'units',unit,...
                 'variance',Fvar(x.average,y.average,x.variance,y.variance));
@@ -202,6 +212,7 @@ classdef quantity < double
             % dF^2 = (y.*x.^(y-1).*dx).^2+(log(x).*x.^y.*dy).^2)
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
+            x = x.to_base;y = y.to_base;
             assert(y.units.is_dimensionless,'quantity:power',...
                 'Power must be dimensionless.')
             unit = x.units^double(y); % combine units
@@ -217,12 +228,9 @@ classdef quantity < double
             % DOUBLE.
             if isscalar(x) && isscalar(y)
                 F = x.^y;
-            elseif isscalar(y) && isinteger(y) && y>=0
-                F = 1;
-                if y==0
-                    return
-                end
-                for n = 1:y
+            elseif isscalar(y) && round(y)==y && y>0
+                F = x;
+                for n = 1:y-1
                     F = F*x;
                 end
             else
@@ -237,6 +245,7 @@ classdef quantity < double
             % dF^2 = (1./y.*dx).^2+(-x./y.^2.*dy).^2
             x = Quantities.quantity.as_quantity(x);
             y = Quantities.quantity.as_quantity(y);
+            x = x.to_base;y = y.to_base;
             unit = x.units./y.units; % combine units
             F = Quantities.quantity(rdivide@double(x,y),'units',unit,...
                 'variance',1./y.average.^2.*x.variance+...
@@ -252,12 +261,7 @@ classdef quantity < double
         function F = ldivide(x,y)
             % F = x.\y = y./x
             % dF^2 = (1./x.*dy).^2+(-y./x.^2.*dx).^2
-            x = Quantities.quantity.as_quantity(x);
-            y = Quantities.quantity.as_quantity(y);
-            unit = x.units.\y.units; % combine units
-            F = Quantities.quantity(ldivide@double(x,y),'units',unit,...
-                'variance',1./x.average.^2.*y.variance+...
-                (y.average./x.average.^2).^2.*x.variance); % (-1)^2 = 1
+            F = y./x;
         end
         function F = mldivide(x,y)
             if isscalar(x) && isscalar(y)
@@ -329,11 +333,15 @@ classdef quantity < double
         end
         function F = to_base(x)
             % TO_BASE Convert units to base units.
-            if x.units.value==1
+            if x.units.value==1 && x.units.offset==0
                 F = x;
                 return
             end
-            F = x.units.value.*x./x.units;
+            average_ = x.average*x.units.value.average+x.units.offset.average;
+            %(dx*y)^2 = (y*dx)^2+(x*dy)^2, if dy==0 then d(x*y) = y*dx
+            stdev_ = x.stdev*x.units.value.average;
+            units_ = x.units.value.units;
+            F = Quantities.quantity(average_,stdev_,units_);
         end
     end
     methods (Static)

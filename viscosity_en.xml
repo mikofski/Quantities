@@ -1,0 +1,9 @@
+<unit name="poise" value="1e-1 * Pa * second">
+  <alias>P</alias>
+</unit>
+
+<unit name="stokes" value="1e-4 * meter ** 2 / second">
+  <alias>St</alias>
+</unit>
+
+<unit name="rhe" value="10 / (Pa * s)"/>
