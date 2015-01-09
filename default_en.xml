@@ -17,9 +17,11 @@
 <!ENTITY energy SYSTEM "energy_en.xml">
 <!ENTITY power SYSTEM "power_en.xml">
 <!ENTITY viscosity SYSTEM "viscosity_en.xml">
+<!ENTITY frequency SYSTEM "frequency_en.xml">
 <!ENTITY EM SYSTEM "EM_en.xml">
 <!ENTITY radiation SYSTEM "radiation_en.xml">
-<!ENTITY frequency SYSTEM "frequency_en.xml">
+<!ENTITY information SYSTEM "information_en.xml">
+<!ENTITY textile SYSTEM "textile_en.xml">
 ]>
 
 <ureg>
@@ -111,11 +113,11 @@
   <!-- Power -->
   &power;
 
-  <!-- Frequency -->
-  &frequency;
-
   <!-- Viscosity -->
   &viscosity;
+
+  <!-- Frequency -->
+  &frequency;
 
   <!-- EM -->
   &EM;
@@ -123,18 +125,15 @@
   <!-- Radiation -->
   &radiation;
 
+  <!-- Information -->
+  &information;
+
+  <!-- Textile -->
+  &textile;
+
   <!-- Heat -->
   <!-- <unit name="RSI" value="degK*meter^2/watt"/> -->
   <!-- <unit name="clo" value="0.155*RSI"><alias>clos</alias></unit> -->
   <!-- <unit name="R_value" value="foot^2*degF*hour/btu"/> -->
   
 </ureg>
-
-# Information
-byte = 8 * bit = Bo = octet
-baud = bit / second = Bd = bps
-
-# Textile
-denier =  gram / (9000 * meter)
-tex = gram/ (1000 * meter)
-dtex = decitex

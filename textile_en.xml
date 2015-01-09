@@ -1,0 +1,5 @@
+<unit name="denier" value="gram/(9000*meter)"/>
+
+<unit name="tex" value="gram/(1000*meter)"/>
+
+<unit name="dtex" value="decitex"/>

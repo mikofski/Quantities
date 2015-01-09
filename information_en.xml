@@ -1,0 +1,9 @@
+<unit name="byte" value="8*bit">
+ <alias>Bo</alias>
+ <alias>octet</alias>
+</unit>
+
+<unit name="baud" value="bit/second">
+  <alias>Bd</alias>
+  <alias>bps</alias>
+</unit>

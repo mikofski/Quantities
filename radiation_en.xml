@@ -1,8 +1,24 @@
-# 
-Bq = Hz = becquerel
-curie = 3.7e10 * Bq = Ci
-rutherford = 1e6*Bq = rd = Rd
-Gy = joule / kilogram = gray = Sv = sievert
-rem = 1e-2 * sievert
-rads = 1e-2 * gray
-roentgen = 2.58e-4 * coulomb / kilogram
+<unit name="Bq" value="Hz">
+  <alias>becquerel</alias>
+</unit>
+
+<unit name="curie" value="3.7e10*Bq">
+  <alias>Ci</alias>
+</unit>
+
+<unit name="rutherford" value="1e6*Bq">
+  <alias>rd</alias>
+  <alias>Rd</alias>
+</unit>
+
+<unit name="Gy" value="joule/kilogram">
+  <alias>gray</alias>
+  <alias>Sv</alias>
+  <alias>sievert</alias>
+</unit>
+
+<unit name="rem" value="1e-2*sievert"/>
+
+<unit name="rads" value="1e-2*gray"/>
+
+<unit name="roentgen" value="2.58e-4*coulomb/kilogram"/>
