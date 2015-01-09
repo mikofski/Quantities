@@ -45,8 +45,8 @@ classdef prefix < double
         % no horzcat, vertcat or cat
         function F = times(pre,u)
             validateattributes(u,{'Quantities.unit'},{'scalar'},'times','u',2)
-            assert(u.value==1,'prefix:times',...
-                'Prefixes can only be combined with base units.')
+%             assert(u.value==1,'prefix:times',...
+%                 'Prefixes can only be combined with base units.')
             F = Quantities.unit([pre.name,u.name],u.dimensionality,...
                 pre.value.*u);
         end

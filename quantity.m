@@ -337,7 +337,10 @@ classdef quantity < double
                 F = x;
                 return
             end
-            average_ = x.average*x.units.value.average+x.units.offset.average;
+            average_ = x.average*x.units.value.average;
+            if x.units.offset~=0
+                average_ = average_+x.units.offset.average;
+            end
             %(dx*y)^2 = (y*dx)^2+(x*dy)^2, if dy==0 then d(x*y) = y*dx
             stdev_ = x.stdev*x.units.value.average;
             units_ = x.units.value.units;
