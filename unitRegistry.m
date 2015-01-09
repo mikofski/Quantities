@@ -190,7 +190,9 @@ classdef unitRegistry < containers.Map
                         % loop through units and compare s.subs to aliases
                         % TODO: search constants for aliases too
                         s_unit = substruct('.','units');
-                        for u = subsref@containers.Map(ureg,s_unit);
+                        search_keys = [subsref@containers.Map(ureg,s_unit),...
+                            subsref@containers.Map(ureg,substruct('.','constants'))];
+                        for u = search_keys;
                             aliases = subsref@containers.Map(ureg,...
                                 substruct('()',u,'.','aliases'));
                             if any(strcmp(s(1).subs,aliases))
