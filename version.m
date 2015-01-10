@@ -1,7 +1,7 @@
 function [v,r] = version
 % VERSION Tag and name of this release.
-v = '0.1';
+v = '0.3';
 if nargout>1
-    r = 'Avengers (alpha)';
+    r = 'Batman (beta)';
 end
 end
