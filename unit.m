@@ -299,9 +299,10 @@ classdef unit < double
         end
         function F = convert(x,y)
             % CONVERT Convert units.
-            if x>=y % check dimensionality
-                F = x;
-            end
+            assert(x>=y,'unit:convert',... check dimensionality
+                'Can only convert to units with matching dimensions.')
+            conversion_factor = y.value/x.value;
+            F = conversion_factor.average * y;
         end
     end
     % TODO: maybe theses should be in unitRegistry?

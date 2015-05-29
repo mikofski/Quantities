@@ -344,7 +344,14 @@ classdef quantity < double
             %(dx*y)^2 = (y*dx)^2+(x*dy)^2, if dy==0 then d(x*y) = y*dx
             stdev_ = x.stdev*x.units.value.average;
             units_ = x.units.value.units;
-            F = Quantities.quantity(average_,stdev_,units_);
+            F = Quantities.quantity(average_,stdev_,units_).to_base;
+        end
+        function F = convert(x,u)
+            % CONVERT Convert units.
+            xunits_as_u = x.units.convert(u);
+            conversion_factor = xunits_as_u.average;
+            F = Quantities.quantity(x.average*conversion_factor,...
+                x.stdev*conversion_factor,u);
         end
     end
     methods (Static)
