@@ -301,8 +301,12 @@ classdef unit < double
             % CONVERT Convert units.
             assert(u>=v,'unit:convert',... check dimensionality
                 'Can only convert to units with matching dimensions.')
-            conversion_factor = u.value/v.value;
-            F = conversion_factor.average * v;
+            if u==v
+                F = Quantities.quantity.as_quantity(u); 
+            else
+                conversion_factor = u.value/v.value;
+                F = conversion_factor.average * v;
+            end
         end
     end
     % TODO: maybe theses should be in unitRegistry?
