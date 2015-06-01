@@ -66,7 +66,7 @@ Usage
 
     >> heat_loss_kg = heat_loss.convert(ureg.kg/ureg.s^3)
     heat_loss_kg =
-	    -819.814 ± 0 [kilogram*second^-3];
+        -819.814 ± 0 [kilogram*second^-3];
 
 7. Determine arbitrary conversion factor.
 
