@@ -297,12 +297,12 @@ classdef unit < double
         function F = is_dimensionless(u)
             F = strcmp(u.name,Quantities.unit.DIMENSIONLESS.name);
         end
-        function F = convert(x,y)
+        function F = convert(u,v)
             % CONVERT Convert units.
-            assert(x>=y,'unit:convert',... check dimensionality
+            assert(u>=v,'unit:convert',... check dimensionality
                 'Can only convert to units with matching dimensions.')
-            conversion_factor = y.value/x.value;
-            F = conversion_factor.average * y;
+            conversion_factor = u.value/v.value;
+            F = conversion_factor.average * v;
         end
     end
     % TODO: maybe theses should be in unitRegistry?
