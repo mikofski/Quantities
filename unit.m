@@ -239,7 +239,7 @@ classdef unit < double
                 end
             else
                 % u is a unit and v is a quantity
-                F = v.\u; % = 1./v.*u;
+                F = 1./v.*u; % = v.\u; % 
             end
         end
         function F = ldivide(u,v)
